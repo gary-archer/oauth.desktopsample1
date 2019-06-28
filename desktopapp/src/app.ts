@@ -31,9 +31,9 @@ class App {
      */
     public async execute(): Promise<void> {
 
-        // Listen for changes to the UI location
-        $(window).on('hashchange', this._onHashChange);
-
+        // Set initial state
+        $('.initiallydisabled').prop('disabled', true);
+        
         // Set up click handlers
         $('#btnHome').click(this._onHome);
         $('#btnRefreshData').click(this._onRefreshData);
@@ -41,6 +41,9 @@ class App {
         $('#btnExpireRefreshToken').click(this._onExpireRefreshToken);
         $('#btnLogout').click(this._onLogout);
         $('#btnClearError').click(this._onClearError);
+
+        // Listen for changes to the UI location
+        $(window).on('hashchange', this._onHashChange);
 
         try {
             // Get configuration
