@@ -7,8 +7,8 @@
 
 ### Details
 
-* See the [Sample 1 Overview](http://authguidance.com/2018/01/11/desktop-apps-overview/) for details of how a Loopback Interface is used
-* See the [Sample 1 Instructions](http://authguidance.com/2018/01/17/desktop-app-how-to-run-the-code-sample/) for infra setup and how to run the code
+* See the [Sample 1 Overview](https://authguidance.com/2018/01/11/desktop-apps-overview/) for details of how a Loopback Interface is used
+* See the [Sample 1 Instructions](https://authguidance.com/2018/01/17/desktop-app-how-to-run-the-code-sample/) for infra setup and how to run the code
 
 ### Technologies
 
