@@ -9,7 +9,7 @@
         "scope":                    "openid profile email offline_access",
         "loopbackMinPort":          8001,
         "loopbackMaxPort":          8003,
-        "postLoginBrowserSuccess":  "https://web.mycompany.com/web/loginsuccess.html",
-        "postLoginBrowserError":    "https://web.mycompany.com/web/loginerror.html"
+        "postLoginBrowserSuccess":  "https://web.mycompany.com/desktop/loginsuccess.html",
+        "postLoginBrowserError":    "https://web.mycompany.com/desktop/loginerror.html"
     }
 }
