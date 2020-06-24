@@ -1,0 +1,42 @@
+{
+  "name": "basicdesktopapp",
+  "version": "1.0.0",
+  "description": "A Desktop App using the AppAuth-JS security library",
+  "main": "built/main.js",
+  "scripts": {
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "build": "rimraf built && tsc",
+    "start": "node_modules/.bin/electron .",
+    "pack": "rimraf dist && electron-packager . --out=dist"
+  },
+  "files": [
+    "built/**"
+  ],
+  "keywords": [],
+  "author": "Gary Archer",
+  "license": "ISC",
+  "dependencies": {
+    "@openid/appauth": "^1.2.7",
+    "axios": "^0.19.2",
+    "electron-default-menu": "^1.0.1",
+    "electron-log": "^4.0.7",
+    "find-free-port": "^2.0.0",
+    "fs-extra": "^8.1.0",
+    "handlebars": "^4.5.3",
+    "jquery": "^3.4.1",
+    "moment": "2.24.0",
+    "opener": "^1.5.1",
+    "url-parse": "^1.4.7"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^8.0.1",
+    "@types/jquery": "^3.3.31",
+    "@types/node": "^12.12.21",
+    "@types/url-parse": "^1.4.3",
+    "electron": "^9.0.0",
+    "electron-packager": "^14.2.1",
+    "rimraf": "^3.0.0",
+    "tslint": "^6.1.2",
+    "typescript": "^3.8.3"
+  }
+}

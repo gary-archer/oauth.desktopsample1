@@ -1,0 +1,17 @@
+{
+    "app": {
+        "apiBaseUrl":       "https://api.authguidance-examples.com/api",
+        "useProxy":         false,
+        "proxyHost":        "http://127.0.0.1",
+        "proxyPort":        8888
+        
+    },
+    "oauth": {
+        "authority":        "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_mZ3NBYpTo",
+        "clientId":         "76nlopdg790upkrdhb9512u8ac",
+        "loopbackMinPort":  8001,
+        "loopbackMaxPort":  8003,
+        "scope":            "openid profile email",
+        "postLoginPage":    "https://web.authguidance-examples.com/loopback/postlogin.html"
+    }
+}
