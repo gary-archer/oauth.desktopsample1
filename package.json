@@ -37,6 +37,6 @@
     "electron-packager": "^15.0.0",
     "rimraf": "^3.0.0",
     "tslint": "^6.1.2",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.5"
   }
 }
