@@ -71,7 +71,7 @@ export class LoginManager {
             client_id: this._configuration.clientId,
             redirect_uri: redirectUri,
             scope: this._configuration.scope,
-        } as AuthorizationRequestJson;
+        };
         const authorizationRequest = new AuthorizationRequest(requestJson, new DefaultCrypto(), true);
 
         // Set up PKCE for the redirect, which avoids native app vulnerabilities

@@ -65,6 +65,6 @@ export class ErrorFormatter {
         return {
             title,
             value,
-        } as ErrorLine;
+        };
     }
 }

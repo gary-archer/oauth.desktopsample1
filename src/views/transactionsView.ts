@@ -9,48 +9,48 @@ import {ErrorCodes} from '../plumbing/errors/errorCodes';
  */
 export class TransactionsView {
 
-  private readonly _apiClient: ApiClient;
-  private readonly _companyId: string;
+    private readonly _apiClient: ApiClient;
+    private readonly _companyId: string;
 
-  public constructor(apiClient: ApiClient, companyId: string) {
-      this._apiClient = apiClient;
-      this._companyId = companyId;
-  }
+    public constructor(apiClient: ApiClient, companyId: string) {
+        this._apiClient = apiClient;
+        this._companyId = companyId;
+    }
 
-  /*
-   * Wait for data then render it
-   */
-  public async load(): Promise<void> {
+    /*
+    * Wait for data then render it
+    */
+    public async load(): Promise<void> {
 
-      try {
+        try {
 
-          // Clear existing content
-          $('#main').html('');
+            // Clear existing content
+            $('#main').html('');
 
-          // Try to get data
-          const data = await this._apiClient.getCompanyTransactions(this._companyId);
+            // Try to get data
+            const data = await this._apiClient.getCompanyTransactions(this._companyId);
 
-          // Render new content
-          this._renderData(data);
+            // Render new content
+            this._renderData(data);
 
-      } catch (uiError) {
+        } catch (uiError) {
 
-          // Handle invalid input due to typing an id into the browser address bar
-          if (uiError.statusCode === 404 && uiError.errorCode === ErrorCodes.companyNotFound) {
+            // Handle invalid input due to typing an id into the browser address bar
+            if (uiError.statusCode === 404 && uiError.errorCode === ErrorCodes.companyNotFound) {
 
-            // User typed an id value outside of valid company ids
-            location.hash = '#';
+                // User typed an id value outside of valid company ids
+                location.hash = '#';
 
-        } else if (uiError.statusCode === 400 && uiError.errorCode === ErrorCodes.invalidCompanyId) {
+            } else if (uiError.statusCode === 400 && uiError.errorCode === ErrorCodes.invalidCompanyId) {
 
-            // User typed an invalid id such as 'abc'
-            location.hash = '#';
+                // User typed an invalid id such as 'abc'
+                location.hash = '#';
 
-        } else {
-            throw uiError;
+            } else {
+                throw uiError;
+            }
         }
-      }
-  }
+    }
 
     /*
     * Render data after receiving it from the API
