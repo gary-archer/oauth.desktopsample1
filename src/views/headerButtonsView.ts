@@ -29,27 +29,27 @@ export class HeaderButtonsView {
     public load() {
 
         const html =
-        `<div class='row'>
-            <div class='col-1 my-2 d-flex'>
-            </div>
-            <div class='col-2 my-2 d-flex'>
-                <button id='btnHome' type='button' class='btn btn-primary btn-block p-1'>Home</button>
-            </div>
-            <div class='col-2 my-2 d-flex'>
-                <button id='btnReloadData' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Reload Data</button>
-            </div>
-            <div class='col-2 my-2 d-flex'>
-                <button id='btnExpireAccessToken' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Expire Access Token</button>
-            </div>
-            <div class='col-2 my-2 d-flex'>
-                <button id='btnExpireRefreshToken' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Expire Refresh Token</button>
-            </div>
-            <div class='col-2 my-2 d-flex'>
-                <button id='btnLogout' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Logout</button>
-            </div>
-            <div class='col-1 my-2 d-flex'>
-            </div>
-        </div>`;
+            `<div class='row'>
+                <div class='col-1 my-2 d-flex'>
+                </div>
+                <div class='col-2 my-2 d-flex'>
+                    <button id='btnHome' type='button' class='btn btn-primary btn-block p-1'>Home</button>
+                </div>
+                <div class='col-2 my-2 d-flex'>
+                    <button id='btnReloadData' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Reload Data</button>
+                </div>
+                <div class='col-2 my-2 d-flex'>
+                    <button id='btnExpireAccessToken' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Expire Access Token</button>
+                </div>
+                <div class='col-2 my-2 d-flex'>
+                    <button id='btnExpireRefreshToken' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Expire Refresh Token</button>
+                </div>
+                <div class='col-2 my-2 d-flex'>
+                    <button id='btnLogout' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Logout</button>
+                </div>
+                <div class='col-1 my-2 d-flex'>
+                </div>
+            </div>`;
         $('#headerbuttons').html(html);
 
         // Button clicks are handled by the parent class

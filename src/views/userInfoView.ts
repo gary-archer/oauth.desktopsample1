@@ -1,5 +1,5 @@
-import Handlebars from 'handlebars';
 import $ from 'jquery';
+import mustache from 'mustache';
 import {ApiClient} from '../api/client/apiClient';
 
 /*
@@ -24,12 +24,7 @@ export class UserInfoView {
         // Render results
         if (claims && claims.givenName && claims.familyName) {
 
-            // Use Handlebars to compile the HTML and handle dangerous characters securely
-            const htmlTemplate = `{{givenName}} {{familyName}}`;
-            const template = Handlebars.compile(htmlTemplate);
-            const html = template(claims);
-
-            // Update the UI
+            const html = mustache.render('{{givenName}} {{familyName}}', claims)
             $(`#${rootElement}`).text(html);
         }
     }

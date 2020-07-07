@@ -2,6 +2,6 @@
  * A simple error line entity
  */
 export interface ErrorLine {
-    title: string;
+    label: string;
     value: string;
 }

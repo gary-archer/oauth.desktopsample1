@@ -1,5 +1,5 @@
-import Handlebars from 'handlebars';
 import $ from 'jquery';
+import mustache from 'mustache';
 import {ApiClient} from '../api/client/apiClient';
 import {Company} from '../api/entities/company';
 
@@ -35,7 +35,8 @@ export class CompaniesView {
     private _renderData(data: Company[]): void {
 
         // Build a view model from the API data
-        const viewModel = data.map((company: Company) => {
+        const viewModel = {} as any;
+        viewModel.companies = data.map((company: Company) => {
             return {
                 id: company.id,
                 name: company.name,
@@ -45,46 +46,45 @@ export class CompaniesView {
             };
         });
 
-        // Construct a Handlebars template
+        // Construct a template
         const htmlTemplate =
-        `<div class='card border-0'>
-            <div class='card-header row'>
-                <div class ='col-1'></div>
-                <div class ='col-2 font-weight-bold'>Account</div>
-                <div class ='col-3'></div>
-                <div class ='col-2 font-weight-bold'>Target USD</div>
-                <div class ='col-2 font-weight-bold'>Investment USD</div>
-                <div class ='col-2 font-weight-bold'># Investors</div>
-            </div>
-            <div>
-                {{#each this}}
-                    <div class='row'>
-                        <div class='col-1 my-auto'>
-                            <img src='images/{{id}}.svg' />
+            `<div class='card border-0'>
+                <div class='card-header row'>
+                    <div class ='col-1'></div>
+                    <div class ='col-2 font-weight-bold'>Account</div>
+                    <div class ='col-3'></div>
+                    <div class ='col-2 font-weight-bold'>Target USD</div>
+                    <div class ='col-2 font-weight-bold'>Investment USD</div>
+                    <div class ='col-2 font-weight-bold'># Investors</div>
+                </div>
+                <div>
+                    {{#companies}}
+                        <div class='row'>
+                            <div class='col-1 my-auto'>
+                                <img src='images/{{id}}.svg' />
+                            </div>
+                            <div class='col-2 my-auto'>
+                                {{name}}
+                            </div>
+                            <div class='col-3 my-auto'>
+                                <a href='#company={{id}}'>View Transactions</a>
+                            </div>
+                            <div class='col-2 my-auto moneycolor font-weight-bold'>
+                                {{formattedTargetUsd}}<br/>
+                            </div>
+                            <div class='col-2 my-auto moneycolor font-weight-bold'>
+                                {{formattedInvestmentUsd}}
+                            </div>
+                            <div class='col-2 my-auto font-weight-bold'>
+                                {{noInvestors}}
+                            </div>
                         </div>
-                        <div class='col-2 my-auto'>
-                            {{name}}
-                        </div>
-                        <div class='col-3 my-auto'>
-                            <a href='#company={{id}}'>View Transactions</a>
-                        </div>
-                        <div class='col-2 my-auto moneycolor font-weight-bold'>
-                            {{formattedTargetUsd}}<br/>
-                        </div>
-                        <div class='col-2 my-auto moneycolor font-weight-bold'>
-                            {{formattedInvestmentUsd}}
-                        </div>
-                        <div class='col-2 my-auto font-weight-bold'>
-                            {{noInvestors}}
-                        </div>
-                    </div>
-                {{/each}}
-            </div>
-        </div>`;
+                    {{/companies}}
+                </div>
+            </div>`;
 
         // Update the main elemnent's content in a manner that handles dangerous characters correctly
-        const template = Handlebars.compile(htmlTemplate);
-        const html = template(viewModel);
+        const html = mustache.render(htmlTemplate, viewModel);
         $('#main').html(html);
     }
 }

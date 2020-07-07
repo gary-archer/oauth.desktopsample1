@@ -1,8 +1,9 @@
-import Handlebars from 'handlebars';
 import $ from 'jquery';
+import mustache from 'mustache';
 import {ErrorCodes} from '../plumbing/errors/errorCodes';
-import {ErrorFormatter} from '../plumbing/errors/errorFormatter';
 import {ErrorHandler} from '../plumbing/errors/errorHandler';
+import {ErrorFormatter} from '../plumbing/errors/errorFormatter';
+import {ErrorLine} from '../plumbing/errors/errorLine';
 import {UIError} from '../plumbing/errors/uiError';
 import {LoginNavigation} from '../plumbing/oauth/login/loginNavigation';
 
@@ -11,31 +12,26 @@ import {LoginNavigation} from '../plumbing/oauth/login/loginNavigation';
  */
 export class ErrorView {
 
-    public constructor() {
-        this._setupCallbacks();
-    }
-
     /*
      * Do the initial render
      */
     public load(): void {
 
+        // Render the containing HTML
         const html =
-        `<div class='card border-0'>
-            <div class='row'>
-                <div class='col-2>
+            `<div class='card border-0'>
+                <div class='row'>
+                    <div id='errortitle' class='col-10 errorcolor largetext font-weight-bold text-center'>
+                    </div>
+                    <div class='col-2 text-right'>
+                        <button id='btnClearError' type='button'>x</button>
+                    </div>
                 </div>
-                <div id='errortitle' class='col-8 errorcolor largetext font-weight-bold text-center'>
+                <div class='row card-body'>
+                    <div id='errorform' class='col-12'>
+                    </div>
                 </div>
-                <div class='col-2 text-right'>
-                    <button id='btnClearError' type='button'>x</button>
-                </div>
-            </div>
-            <div class='row card-body'>
-                <div id='errorform'  class='col-12'>
-                </div>
-            </div>
-        </div>`;
+            </div>`;
         $('#errorcontainer').html(html);
         $('#errorcontainer').hide();
 
@@ -80,40 +76,64 @@ export class ErrorView {
         $('#errortitle').html('');
         $('#errorcontainer').show();
 
-        // Get error details ready for display
-        const formatter = new ErrorFormatter();
-        const viewModel = {
-            title: formatter.getErrorTitle(error),
-            lines: formatter.getErrorLines(error),
-        };
-
         // Render the title
-        const titleTemplate = Handlebars.compile(`{{title}}`);
-        const titleHtml = titleTemplate(viewModel);
-        $('#errortitle').html(titleHtml);
+        $('#errortitle').html('Problem Encountered');
 
-        // Render the lines
-        const htmlTemplate =
-        `{{#each this}}
-            <div class='row'>
-                <div class='col-4'>
-                    {{title}}
-                </div>
-                <div class='col-8 valuecolor font-weight-bold'>
-                    {{value}}
-                </div>
-            </div>
-        {{/each}}`;
-
-        const linesTemplate = Handlebars.compile(htmlTemplate);
-        const linesHtml = linesTemplate(viewModel.lines);
-        $('#errorform').html(linesHtml);
+        // Render the error fields
+        const formatter = new ErrorFormatter();
+        const errorHtml =
+            this._getLinesHtml(formatter.getErrorLines(error)) +
+            this._getStackHtml(formatter.getErrorStack(error));
+        $('#errorform').html(errorHtml);
     }
 
     /*
-     * Plumbing to make the this parameter available in callbacks
+     * Get the HTML for the error lines
      */
-    private _setupCallbacks(): void {
-        this.clear = this.clear.bind(this);
-   }
+    private _getLinesHtml(errorLines: ErrorLine[]): string {
+
+        const htmlTemplate =
+            `{{#lines}}
+                <div class='row'>
+                    <div class='col-4'>
+                        {{label}}
+                    </div>
+                    <div class='col-8 valuecolor font-weight-bold'>
+                        {{value}}
+                    </div>
+                </div>
+            {{/lines}}`;
+
+        return mustache.render(htmlTemplate, {lines: errorLines});
+    }
+
+    /*
+     * Get the HTML for the error stack trace
+     */
+    private _getStackHtml(stackLine: ErrorLine | null): string {
+
+        if (!stackLine) {
+            return '';
+        }
+
+        const htmlTemplate =
+            `<div class='row' />
+                <div class='col-4'>
+                    &nbsp;
+                </div>
+                <div class='col-8'>
+                    &nbsp;
+                </div>
+            </div>
+            <div class='row' />
+                 <div class='col-4'>
+                     {{label}}
+                 </div>
+                 <div class='col-8 small'>
+                     {{value}}
+                 </div>
+             </div>`;
+
+        return mustache.render(htmlTemplate, stackLine);
+    }
 }

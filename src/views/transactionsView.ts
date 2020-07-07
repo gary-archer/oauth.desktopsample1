@@ -1,5 +1,5 @@
-import Handlebars from 'handlebars';
 import $ from 'jquery';
+import mustache from 'mustache';
 import {ApiClient} from '../api/client/apiClient';
 import {CompanyTransactions} from '../api/entities/companyTransactions';
 import {ErrorCodes} from '../plumbing/errors/errorCodes';
@@ -70,39 +70,38 @@ export class TransactionsView {
         };
 
         const htmlTemplate =
-        `<div class='card border-0'>
-            <div class='card-header row font-weight-bold'>
-                <div class='col-12 text-center mx-auto font-weight-bold'>
-                    {{this.title}}
+            `<div class='card border-0'>
+                <div class='card-header row font-weight-bold'>
+                    <div class='col-12 text-center mx-auto font-weight-bold'>
+                        {{title}}
+                    </div>
                 </div>
-            </div>
-            <div class='row'>
-                {{#each this.transactions}}
-                    <div class='col-lg-4 col-md-6 col-xs-12'>
-                        <div class='card'>
-                            <div class='card-body'>
-                                <div class='row'>
-                                    <div class='col-6'>Transaction Id</div>
-                                    <div class='col-6 text-right valuecolor font-weight-bold'>{{id}}</div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-6'>Investor Id</div>
-                                    <div class='col-6 text-right valuecolor font-weight-bold'>{{investorId}}</div>
-                                </div>
-                                <div class='row'>
-                                    <div class='col-6'>Amount USD</div>
-                                    <div class='col-6 text-right moneycolor font-weight-bold'>{{formattedAmountUsd}}</div>
+                <div class='row'>
+                    {{#transactions}}
+                        <div class='col-lg-4 col-md-6 col-xs-12'>
+                            <div class='card'>
+                                <div class='card-body'>
+                                    <div class='row'>
+                                        <div class='col-6'>Transaction Id</div>
+                                        <div class='col-6 text-right valuecolor font-weight-bold'>{{id}}</div>
+                                    </div>
+                                    <div class='row'>
+                                        <div class='col-6'>Investor Id</div>
+                                        <div class='col-6 text-right valuecolor font-weight-bold'>{{investorId}}</div>
+                                    </div>
+                                    <div class='row'>
+                                        <div class='col-6'>Amount USD</div>
+                                        <div class='col-6 text-right moneycolor font-weight-bold'>{{formattedAmountUsd}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {{/each}}
-            </div>
-        </div>`;
+                    {{/transactions}}
+                </div>
+            </div>`;
 
         // Update the main elemnent's content in a manner that handles dangerous characters correctly
-        const template = Handlebars.compile(htmlTemplate);
-        const html = template(viewModel);
+        const html = mustache.render(htmlTemplate, viewModel);
         $('#main').html(html);
     }
 }

@@ -50,20 +50,29 @@ export class ErrorFormatter {
             lines.push(this._createErrorLine('URL', error.url));
         }
 
+        return lines;
+    }
+
+    /*
+     * Return the stack separately, since it is rendered in smaller text
+     */
+    public getErrorStack(error: UIError): ErrorLine | null {
+
+        // Render the stack trace as a long string that can be decompiled at https://sourcemaps.info
         if (error.stack) {
-            lines.push(this._createErrorLine('Stack', error.stack));
+            return this._createErrorLine('Stack', error.stack);
         }
 
-        return lines;
+        return null;
     }
 
     /*
      * Return an error line as an object
      */
-    private _createErrorLine(title: string, value: string): ErrorLine {
+    private _createErrorLine(label: string, value: string): ErrorLine {
 
         return {
-            title,
+            label,
             value,
         };
     }

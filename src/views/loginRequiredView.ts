@@ -40,16 +40,16 @@ export class LoginRequiredView {
 
         // Render the HTML
         const html =
-        `<div class='row'>
-            <div class='col-12 text-center mx-auto loginrequired'>
-                <h5>
-                    You are logged out - click HOME to sign in ...
-                </h5>
-                <p id='signingin' class='initiallyhidden signingincolor'>
-                    Sign In has started. If required, please switch to your browser and enter your credentials ...
-                </p>
-            </div>
-        </div>`;
+            `<div class='row'>
+                <div class='col-12 text-center mx-auto loginrequired'>
+                    <h5>
+                        You are logged out - click HOME to sign in ...
+                    </h5>
+                    <p id='signingin' class='initiallyhidden signingincolor'>
+                        Sign In has started. If required, please switch to your browser and enter your credentials ...
+                    </p>
+                </div>
+            </div>`;
         $('#main').html(html);
     }
 

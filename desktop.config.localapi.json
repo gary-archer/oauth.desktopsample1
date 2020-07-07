@@ -1,7 +1,7 @@
 {
     "app": {
         "apiBaseUrl":       "https://api.mycompany.com/api",
-        "useProxy":         false,
+        "useProxy":         true,
         "proxyHost":        "http://127.0.0.1",
         "proxyPort":        8888
     },
