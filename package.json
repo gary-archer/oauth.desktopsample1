@@ -23,6 +23,7 @@
     "find-free-port": "^2.0.0",
     "fs-extra": "^8.1.0",
     "jquery": "^3.4.1",
+    "lodash": "^4.17.19",
     "moment": "2.24.0",
     "mustache": "^4.0.1",
     "opener": "^1.5.1",
