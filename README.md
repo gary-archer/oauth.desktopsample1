@@ -1,5 +1,7 @@
 # authguidance.desktopsample1
 
+[![Known Vulnerabilities](https://snyk.io/test/github/gary-archer/authguidance.desktopsample1/badge.svg?targetFile=package.json)](https://snyk.io/test/github/gary-archer/authguidance.desktopsample1?targetFile=package.json)
+
 ### Overview
 
 * A desktop sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
