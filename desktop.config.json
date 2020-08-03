@@ -7,8 +7,8 @@
         
     },
     "oauth": {
-        "authority":        "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_mZ3NBYpTo",
-        "clientId":         "76nlopdg790upkrdhb9512u8ac",
+        "authority":        "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn",
+        "clientId":         "49onjnhrr56v4thun3fljdji5",
         "loopbackMinPort":  8001,
         "loopbackMaxPort":  8003,
         "scope":            "openid profile email",
