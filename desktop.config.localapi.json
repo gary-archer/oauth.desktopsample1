@@ -1,7 +1,7 @@
 {
     "app": {
-        "apiBaseUrl":       "https://api.mycompany.com/api",
-        "useProxy":         true,
+        "apiBaseUrl":       "https://api.mycompany.com:444/api",
+        "useProxy":         false,
         "proxyHost":        "http://127.0.0.1",
         "proxyPort":        8888
     },
@@ -11,6 +11,6 @@
         "loopbackMinPort":  8001,
         "loopbackMaxPort":  8003,
         "scope":            "openid profile email offline_access",
-        "postLoginPage":    "https://web.authguidance-examples.com/loopback/postlogin.html"
+        "postLoginPage":    "https://mobile.authsamples.com/desktoploopback/postlogin.html"
     }
 }
