@@ -11,6 +11,6 @@
         "loopbackMinPort":  8001,
         "loopbackMaxPort":  8003,
         "scope":            "openid profile email offline_access",
-        "postLoginPage":    "https://mobile.authsamples.com/desktoploopback/postlogin.html"
+        "postLoginPage":    "https://mobile.authsamples.com/html/basicdesktopapp/postlogin.html"
     }
 }
