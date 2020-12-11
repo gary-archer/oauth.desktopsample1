@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <meta http-equiv='Content-Security-Policy' content="script-src 'self' 'unsafe-inline'">
+        <title>OAuth 2.x Sample - Demo App</title>
+
+        <link rel='stylesheet' href='css/bootstrap.min.css'>
+        <link rel='stylesheet' href='css/app.css'>
+    </head>
+    <body>
+        <div class='container'>
+
+            <!-- The header area displays the title and the logged in user -->
+            <div id='title'></div>
+
+            <!-- The button area for testing session related operations -->
+            <div id='headerbuttons'></div>
+            
+            <!-- Error details when applicable -->
+            <div id='errorcontainer'></div>
+
+            <!-- The SPA's main view which is swapped out as the user navigates -->
+            <div id='main'></div>
+        </div>
+        
+        <!-- The HTML app runs as the Electron renderer process -->
+        <script type='text/javascript'>
+            require('./built/renderer');
+        </script>
+    </body>
+</html>
