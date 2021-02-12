@@ -35,7 +35,7 @@
     "@types/url-parse": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^4.10.0",
     "@typescript-eslint/parser": "^4.10.0",
-    "electron": "^11.0.3",
+    "electron": "^11.2.3",
     "electron-packager": "^15.1.0",
     "eslint": "^7.15.0",
     "rimraf": "^3.0.2",
