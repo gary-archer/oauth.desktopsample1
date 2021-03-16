@@ -45,7 +45,7 @@ export class ApiClient {
      */
     public async getUserInfo(): Promise<UserInfoClaims> {
 
-        return await this._callApi('userclaims/current', 'GET') as UserInfoClaims;
+        return await this._callApi('userinfo', 'GET') as UserInfoClaims;
     }
 
     /*
