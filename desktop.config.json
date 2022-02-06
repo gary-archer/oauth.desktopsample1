@@ -1,0 +1,13 @@
+{
+    "app": {
+        "apiBaseUrl":       "https://api.authsamples.com/api"
+    },
+    "oauth": {
+        "authority":        "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_qqJgVeuTn",
+        "clientId":         "49onjnhrr56v4thun3fljdji5",
+        "loopbackMinPort":  8001,
+        "loopbackMaxPort":  8003,
+        "scope":            "openid profile email https://api.authsamples.com/api/transactions_read",
+        "postLoginPage":    "https://authsamples.com/apps/basicdesktopapp/postlogin.html"
+    }
+}
