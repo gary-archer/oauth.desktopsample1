@@ -34,19 +34,19 @@ export class HeaderButtonsView {
         const html =
             `<div class='row'>
                 <div class='col col-one-fifth my-2 d-flex p-1'>
-                    <button id='btnHome' type='button' class='btn btn-primary btn-block p-1'>Home</button>
+                    <button id='btnHome' type='button' class='btn btn-primary w-100 p-1'>Home</button>
                 </div>
                 <div class='col col-one-fifth my-2 d-flex p-1'>
-                    <button id='btnReloadData' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Reload Data</button>
+                    <button id='btnReloadData' type='button' disabled class='btn btn-primary w-100 p-1 sessionbutton'>Reload Data</button>
                 </div>
                 <div class='col col-one-fifth my-2 d-flex p-1'>
-                    <button id='btnExpireAccessToken' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Expire Access Token</button>
+                    <button id='btnExpireAccessToken' type='button' disabled class='btn btn-primary w-100 p-1 sessionbutton'>Expire Access Token</button>
                 </div>
                 <div class='col col-one-fifth my-2 d-flex p-1'>
-                    <button id='btnExpireRefreshToken' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Expire Refresh Token</button>
+                    <button id='btnExpireRefreshToken' type='button' disabled class='btn btn-primary w-100 p-1 sessionbutton'>Expire Refresh Token</button>
                 </div>
                 <div class='col col-one-fifth my-2 d-flex p-1'>
-                    <button id='btnLogout' type='button' disabled class='btn btn-primary btn-block p-1 sessionbutton'>Logout</button>
+                    <button id='btnLogout' type='button' disabled class='btn btn-primary w-100 p-1 sessionbutton'>Logout</button>
                 </div>
             </div>`;
         DomUtils.html('#headerbuttons', html);
