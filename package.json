@@ -22,7 +22,7 @@
     "electron-log": "^4.3.0",
     "find-free-port": "^2.0.0",
     "fs-extra": "^9.0.1",
-    "moment": "2.29.0",
+    "moment": "2.29.2",
     "mustache": "^4.2.0",
     "opener": "^1.5.1",
     "url-parse": "^1.5.9"
