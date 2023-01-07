@@ -2,24 +2,27 @@
   "name": "basicdesktopapp",
   "version": "1.0.0",
   "description": "An OpenID Connect secured Desktop App using the AppAuth-JS security",
+  "keywords": [],
+  "author": "Gary Archer",
+  "license": "MIT",
   "main": "built/main.js",
+  "type": "commonjs",
+  "files": [
+    "built/**"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "lint": "npx eslint . --ext .ts",
     "build": "rimraf built && tsc",
     "start": "bash ./start.sh",
     "pack": "rimraf dist && electron-packager . --out=dist"
   },
-  "files": [
-    "built/**"
-  ],
-  "keywords": [],
-  "author": "Gary Archer",
-  "license": "MIT",
   "dependencies": {
     "@openid/appauth": "^1.3.1",
     "axios": "^1.2.1",
     "electron-default-menu": "^1.0.2",
-    "electron-log": "^4.4.8",
     "find-free-port": "^2.0.0",
     "fs-extra": "^9.1.0",
     "moment": "2.29.4",

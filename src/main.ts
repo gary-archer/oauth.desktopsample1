@@ -4,8 +4,7 @@
 
 import {app, BrowserWindow, ipcMain, Menu, session, shell} from 'electron';
 import DefaultMenu from 'electron-default-menu';
-import log from 'electron-log';
-import {ApplicationEventNames} from './plumbing/events/applicationEventNames';
+import {ApplicationEventNames} from './plumbing/events/applicationEventNames.js';
 
 /*
  * The Electron main process entry point
@@ -24,9 +23,6 @@ class Main {
      */
     public execute(): void {
 
-        // Show a startup message, which is reported to the console
-        log.info('STARTING ELECTRON MAIN PROCESS');
-
         // This method will be called when Electron has finished initialization and is ready to create browser windows
         // Some APIs can only be used after this event occurs
         app.on('ready', this._createMainWindow);
@@ -36,12 +32,15 @@ class Main {
 
         // Quit when all windows are closed
         app.on('window-all-closed', this._onAllWindowsClosed);
+        console.log('*** done execute');
     }
 
     /*
      * Do the main window creation
      */
     private _createMainWindow(): void {
+
+        console.log('*** create main');
 
         // Create the browser window
         // Note that node integration is needed in order to use 'require' in index.html
@@ -143,6 +142,6 @@ class Main {
     }
 }
 
-// Run our main class
+// Execute the main class
 const main = new Main();
 main.execute();

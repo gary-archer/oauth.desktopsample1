@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2017",
     "strict": true,
-    "outDir": "built",
-    "lib": ["es2017", "dom"],
+    "target": "ES2017",
+    "lib": ["ES2022", "DOM"],
     "module": "CommonJS",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
+    "outDir": "built",
     "sourceMap": true
   },
   "include": [
