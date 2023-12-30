@@ -38,9 +38,9 @@
     "@types/url-parse": "^1.4.8",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.9.0",
-    "electron": "^27.0.2",
+    "electron": "^28.1.0",
     "electron-packager": "^17.1.2",
     "eslint": "^8.52.0",
-    "typescript": "^5.2.0"
+    "typescript": "^5.3.3"
   }
 }
