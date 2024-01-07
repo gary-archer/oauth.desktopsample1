@@ -58,6 +58,11 @@ export class ApiClient {
 
         // Get the access token, and if it does not exist a login redirect will be triggered
         let token = await this._authenticator.getAccessToken();
+        if (!token) {
+
+            // Throw an error that will navigate to the login required view
+            throw ErrorFactory.getFromLoginRequired();
+        }
 
         try {
 
@@ -73,6 +78,11 @@ export class ApiClient {
 
             // If we received a 401 then try to refresh the access token
             token = await this._authenticator.refreshAccessToken();
+            if (!token) {
+
+                // Throw an error that will navigate to the login required view
+                throw ErrorFactory.getFromLoginRequired();
+            }
 
             // Call the API again
             return await this._callApiWithToken(url, method, dataToSend, token);
@@ -105,17 +115,5 @@ export class ApiClient {
         } catch (e: any) {
             throw ErrorFactory.getFromHttpError(e, url, 'web API');
         }
-    }
-
-    /*
-     * API 401s are handled via a retry with a new token
-     */
-    private _isApi401Error(error: any) {
-
-        if (error.response && error.response.status === 401) {
-            return true;
-        }
-
-        return false;
     }
 }

@@ -6,10 +6,10 @@ import {OAuthUserInfo} from './oauthUserInfo';
 export interface Authenticator {
 
     // Try to get an access token
-    getAccessToken(): Promise<string>;
+    getAccessToken(): Promise<string | null>;
 
     // Refresh the access token when it expires
-    refreshAccessToken(): Promise<string>;
+    refreshAccessToken(): Promise<string | null>;
 
     // Do the login redirect and process the response
     login(): Promise<void>;

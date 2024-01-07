@@ -39,23 +39,21 @@ export class AuthenticatorImpl implements Authenticator {
     }
 
     /*
-     * Get an access token and login if required
+     * Try to get an existing access token
      */
-    public async getAccessToken(): Promise<string> {
+    public async getAccessToken(): Promise<string | null> {
 
-        // Return the existing token if present
         if (this._tokens && this._tokens.accessToken) {
             return this._tokens.accessToken;
         }
 
-        // Try to use the refresh token to get a new access token
-        return this.refreshAccessToken();
+        return null;
     }
 
     /*
      * Try to refresh an access token
      */
-    public async refreshAccessToken(): Promise<string> {
+    public async refreshAccessToken(): Promise<string | null> {
 
         // Try to use the refresh token to get a new access token
         if (this._tokens && this._tokens.refreshToken) {
@@ -69,8 +67,7 @@ export class AuthenticatorImpl implements Authenticator {
             }
         }
 
-        // Trigger a login redirect if there are no unexpected errors but we cannot refresh
-        throw ErrorFactory.getFromLoginRequired();
+        return null;
     }
 
     /*
@@ -102,7 +99,7 @@ export class AuthenticatorImpl implements Authenticator {
      * The first desktop sample just does a basic logoutby clearing tokens from memory
      */
     public logout(): void {
-        this._tokens = null;
+        this._resetDataOnLogout();
     }
 
     /*
@@ -110,7 +107,6 @@ export class AuthenticatorImpl implements Authenticator {
      */
     public async getUserInfo(): Promise<OAuthUserInfo> {
 
-        // First check that we have an access token
         let accessToken = await this.getAccessToken();
 
         try {
@@ -119,7 +115,7 @@ export class AuthenticatorImpl implements Authenticator {
             await this._loadMetadata();
 
             // Call the API
-            return await this._makeUserInfoRequest(accessToken);
+            return await this._makeUserInfoRequest(accessToken!);
 
         } catch (e: any) {
 
@@ -130,7 +126,7 @@ export class AuthenticatorImpl implements Authenticator {
 
             // If we received a 401 then try to get a new token
             accessToken = await this.refreshAccessToken();
-            return await this._makeUserInfoRequest(accessToken);
+            return await this._makeUserInfoRequest(accessToken!);
         }
     }
 
@@ -263,7 +259,7 @@ export class AuthenticatorImpl implements Authenticator {
             if (e.error === ErrorCodes.refreshTokenExpired) {
 
                 // Handle refresh token expired errors by clearing all token data
-                this._tokens = null;
+                this._resetDataOnLogout();
 
             } else {
 
@@ -301,6 +297,13 @@ export class AuthenticatorImpl implements Authenticator {
 
             throw ErrorFactory.getFromHttpError(e, this._metadata!.userInfoEndpoint!, 'authorization server');
         }
+    }
+
+    /*
+     * Clear data when the session expires or the user logs out
+     */
+    private async _resetDataOnLogout(): Promise<void> {
+        this._tokens = null;
     }
 
     /*
