@@ -25,7 +25,7 @@ Build and run the app via this command, which will trigger the OpenID Connect de
 ```
 
 A login is triggered in the system browser, so that the app cannot access the user's credentials.\
-A lookback redirect URI, such as `http://localhost:8001`, runs on the local computer, to receive the login response. 
+A lookback redirect URI runs on the local computer to receive the login response. 
 
 ![Desktop App Login](./doc/login.png)
 
@@ -48,6 +48,6 @@ You can then test logins, API calls and token renewal:
 
 ## Infrastructure
 
-* The [AppAuth-JS Library](https://github.com/openid/AppAuth-JS/blob/master/README.md) is used to implement the Authorization Code Flow (PKCE)
+* The [AppAuth-JS](https://github.com/openid/AppAuth-JS/blob/master/README.md) library is used to implement the Authorization Code Flow (PKCE)
 * AWS API Gateway is used to host our sample OAuth Secured API
 * AWS Cognito is used as the default Authorization Server for the UI and API
