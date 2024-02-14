@@ -11,7 +11,7 @@
     "built/**"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "lint": "npx eslint . --ext .ts",
