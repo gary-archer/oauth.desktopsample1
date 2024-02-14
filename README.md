@@ -18,7 +18,8 @@ The data is returned from an API that authorizes access to resources using domai
 
 ## Local Development Quick Start
 
-Build and run the app via this command, which will trigger the OpenID Connect desktop flow:
+First ensure that Node.js 20+ is installed.\
+Then build and run the app via this command, which will trigger the OpenID Connect desktop flow:
 
 ```bash
 ./start.sh
