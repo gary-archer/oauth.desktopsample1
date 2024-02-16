@@ -58,11 +58,7 @@ fi
 #
 # Run differently depending on the platform
 #
-if [ "$PLATFORM" == 'WINDOWS' ]; then
-  node_modules/.bin/electron.cmd .
-else
-  node_modules/.bin/electron .
-fi
+npx electron .
 if [ $? -ne 0 ]; then
   echo 'Problem encountered running the desktop app'
   exit
