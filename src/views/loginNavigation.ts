@@ -1,5 +1,3 @@
-import urlparse from 'url-parse';
-
 /*
  * A utility class to manage navigating to login required and returning to the previous location after login
  */
@@ -24,13 +22,12 @@ export class LoginNavigation {
         if (location.hash.length > 1) {
 
             // Use this library to get the hash fragment parts, which are returned in a 'query' object
-            const urlData = urlparse('?' + location.hash.substring(1), true);
-
-            // See if the hash fragment has a return parameter
-            if (urlData && urlData.query && urlData.query.return) {
+            const params = new URLSearchParams(location.hash.substring(1));
+            const returnPath = params.get('return');
+            if (returnPath) {
 
                 // If so return to the pre login location
-                const hash = decodeURIComponent(urlData.query.return);
+                const hash = decodeURIComponent(returnPath);
                 location.hash = hash;
                 return;
             }
