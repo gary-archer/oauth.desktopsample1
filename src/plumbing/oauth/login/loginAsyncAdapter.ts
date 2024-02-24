@@ -6,45 +6,34 @@ import {
     AuthorizationServiceConfiguration,
     DefaultCrypto} from '@openid/appauth';
 import {OAuthConfiguration} from '../../../configuration/oauthConfiguration';
-import {ErrorCodes} from '../../errors/errorCodes';
-import {ErrorFactory} from '../../errors/errorFactory';
-import {LoopbackWebServer} from '../utilities/loopbackWebServer';
 import {BrowserLoginRequestHandler} from './browserLoginRequestHandler';
+import {LoginRedirectResult} from './loginRedirectResult';
 import {LoginState} from './loginState';
 
 /*
- * A class to handle the plumbing of login redirects via the system browser
+ * The AppAuth-JS class uses some old Node.js style callbacks
+ * This class adapts them to a modern async await syntax
  */
-export class LoginManager {
+export class LoginAsyncAdapter {
 
     private readonly _configuration: OAuthConfiguration;
     private readonly _metadata: AuthorizationServiceConfiguration;
     private readonly _state: LoginState;
-    private readonly _onCodeReceived: (code: string, redirectUri: string, verifier: string) => Promise<void>;
 
     public constructor(
         configuration: OAuthConfiguration,
         metadata: AuthorizationServiceConfiguration,
-        state: LoginState,
-        onCodeReceived: (code: string, redirectUri: string, verifier: string) => Promise<void>) {
+        state: LoginState) {
 
         this._configuration = configuration;
         this._metadata = metadata;
         this._state = state;
-        this._onCodeReceived = onCodeReceived;
     }
 
     /*
      * Start the login redirect and listen for the response
      */
-    public async login(): Promise<void> {
-
-        // Get a port to listen on and then start the loopback web server
-        const server = new LoopbackWebServer(this._configuration, this._state);
-        const runtimePort = await server.start();
-
-        // Get the redirect URI, which will be a value such as http://localhost:8001
-        const redirectUri = `http://localhost:${runtimePort}`;
+    public async login(redirectUri: string): Promise<LoginRedirectResult> {
 
         // Create the authorization request
         const requestJson = {
@@ -69,8 +58,7 @@ export class LoginManager {
                 error: AuthorizationError | null) => {
 
                 try {
-                    await this._handleLoginResponse(request, response, error, redirectUri);
-                    resolve();
+                    resolve({request, response, error});
 
                 } catch (e: any) {
                     reject(e);
@@ -82,34 +70,5 @@ export class LoginManager {
             browserLoginRequestHandler.setAuthorizationNotifier(notifier);
             browserLoginRequestHandler.performAuthorizationRequest(this._metadata, authorizationRequest);
         });
-    }
-
-    /*
-     * Start the second phase of login, to swap the authorization code for tokens
-     */
-    private async _handleLoginResponse(
-        request: AuthorizationRequest,
-        response: AuthorizationResponse | null,
-        error: AuthorizationError | null,
-        redirectUri: string): Promise<void> {
-
-        // The first phase of login has completed
-        if (error) {
-            throw ErrorFactory.getFromLoginOperation(error, ErrorCodes.loginResponseFailed);
-        }
-
-        try {
-
-            // Get the PKCE verifier
-            const codeVerifierKey = 'code_verifier';
-            const codeVerifier = request.internal![codeVerifierKey];
-
-            // Swap the authorization code for tokens
-            await this._onCodeReceived(response!.code, redirectUri, codeVerifier);
-
-        } catch (e: any) {
-
-            throw ErrorFactory.getFromTokenError(e, ErrorCodes.authorizationCodeGrantFailed);
-        }
     }
 }

@@ -5,6 +5,9 @@ import {OAuthUserInfo} from './oauthUserInfo';
  */
 export interface Authenticator {
 
+    // Indicate if the user is logged in
+    isLoggedIn(): boolean;
+
     // Try to get an access token
     getAccessToken(): Promise<string | null>;
 
@@ -14,7 +17,7 @@ export interface Authenticator {
     // Do the login redirect and process the response
     login(): Promise<void>;
 
-    // Do the logout redirect and process the response
+    // Run the logout logic
     logout(): void;
 
     // Get identity attributes to the UI

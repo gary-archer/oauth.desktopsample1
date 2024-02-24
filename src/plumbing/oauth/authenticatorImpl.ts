@@ -10,12 +10,14 @@ import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {ErrorCodes} from '../errors/errorCodes';
 import {ErrorFactory} from '../errors/errorFactory';
 import {Authenticator} from './authenticator';
-import {LoginManager} from './login/loginManager';
+import {LoginAsyncAdapter} from './login/loginAsyncAdapter';
+import {LoginRedirectResult} from './login/loginRedirectResult';
 import {LoginState} from './login/loginState';
 import {OAuthUserInfo} from './oauthUserInfo';
 import {TokenData} from './tokenData';
 import {AxiosUtils} from '../utilities/axiosUtils';
 import {CustomRequestor} from './utilities/customRequestor';
+import {LoopbackWebServer} from './utilities/loopbackWebServer';
 
 /*
  * The entry point class for login and token requests
@@ -36,6 +38,13 @@ export class AuthenticatorImpl implements Authenticator {
 
         // Initialise state, used to correlate responses from the system browser with the original requests
         this._loginState = new LoginState();
+    }
+
+    /*
+     * The user is logged in if there are valid tokens
+     */
+    public isLoggedIn(): boolean {
+        return !!this._tokens;
     }
 
     /*
@@ -74,25 +83,7 @@ export class AuthenticatorImpl implements Authenticator {
      * Begin an authorization redirect when the user clicks the Sign In button
      */
     public async login(): Promise<void> {
-
-        try {
-
-            // Download metadata from the Authorization server if required
-            await this._loadMetadata();
-
-            // Start the login process
-            const loginManager = new LoginManager(
-                this._configuration,
-                this._metadata!,
-                this._loginState,
-                this._swapAuthorizationCodeForTokens);
-            await loginManager.login();
-
-        } catch (e: any) {
-
-            // Do error translation if required
-            throw ErrorFactory.getFromLoginOperation(e, ErrorCodes.loginRequestFailed);
-        }
+        await this._startLogin();
     }
 
     /*
@@ -166,44 +157,89 @@ export class AuthenticatorImpl implements Authenticator {
     }
 
     /*
+     * Do the work of starting a login redirect
+     */
+    private async _startLogin(): Promise<void> {
+
+        try {
+
+            // Get a port to listen on and then start the loopback web server
+            const server = new LoopbackWebServer(this._configuration, this._loginState);
+            const runtimePort = await server.start();
+            const redirectUri = `http://localhost:${runtimePort}`;
+
+            // Download metadata from the Authorization server if required
+            await this._loadMetadata();
+
+            // Run a login on the system browser and get the result
+            const adapter = new LoginAsyncAdapter(
+                this._configuration,
+                this._metadata!,
+                this._loginState);
+            const result = await adapter.login(redirectUri);
+
+            // Handle errors in the browser response
+            if (result.error) {
+                throw ErrorFactory.getFromLoginOperation(result.error, ErrorCodes.loginResponseFailed);
+            }
+
+            // Swap the authorization code for tokens
+            await this._endLogin(result, redirectUri);
+
+        } catch (e: any) {
+
+            // Do error translation if required
+            throw ErrorFactory.getFromLoginOperation(e, ErrorCodes.loginRequestFailed);
+        }
+    }
+
+    /*
      * Swap the authorizasion code for a refresh token and access token
      */
-    private async _swapAuthorizationCodeForTokens(
-        authorizationCode: string,
-        redirectUri: string,
-        codeVerifier: string): Promise<void> {
+    private async _endLogin(result: LoginRedirectResult, redirectUri: string): Promise<void> {
 
-        // Supply PKCE parameters for the code exchange
-        const extras: StringMap = {
-            code_verifier: codeVerifier,
-        };
+        try {
 
-        // Create the token request
-        const requestJson = {
-            grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
-            code: authorizationCode,
-            redirect_uri: redirectUri,
-            client_id: this._configuration.clientId,
-            extras,
-        };
-        const tokenRequest = new TokenRequest(requestJson);
+            // Get the PKCE verifier
+            const codeVerifier = result.request.internal!['code_verifier'];
 
-        // Execute the request to swap the code for tokens
-        const requestor = new CustomRequestor();
-        const tokenHandler = new BaseTokenRequestHandler(requestor);
+            // Supply PKCE parameters for the code exchange
+            const extras: StringMap = {
+                code_verifier: codeVerifier,
+            };
 
-        // Perform the authorization code grant exchange
-        const tokenResponse = await tokenHandler.performTokenRequest(this._metadata!, tokenRequest);
+            // Create the token request
+            const requestJson = {
+                grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
+                code: result.response!.code,
+                redirect_uri: redirectUri,
+                client_id: this._configuration.clientId,
+                extras,
+            };
+            const tokenRequest = new TokenRequest(requestJson);
 
-        // Set values from the response
-        const newTokenData = {
-            accessToken: tokenResponse.accessToken,
-            refreshToken: tokenResponse.refreshToken ? tokenResponse.refreshToken : null,
-            idToken: tokenResponse.idToken ? tokenResponse.idToken : null,
-        };
+            // Execute the request to swap the code for tokens
+            const requestor = new CustomRequestor();
+            const tokenHandler = new BaseTokenRequestHandler(requestor);
 
-        // Update tokens in memory
-        this._tokens = newTokenData;
+            // Perform the authorization code grant exchange
+            const tokenResponse = await tokenHandler.performTokenRequest(this._metadata!, tokenRequest);
+
+            // Set values from the response
+            const newTokenData = {
+                accessToken: tokenResponse.accessToken,
+                refreshToken: tokenResponse.refreshToken ? tokenResponse.refreshToken : null,
+                idToken: tokenResponse.idToken ? tokenResponse.idToken : null,
+            };
+
+            // Update tokens in memory
+            this._tokens = newTokenData;
+
+        } catch (e: any) {
+
+            // Do error translation if required
+            ErrorFactory.getFromTokenError(e, ErrorCodes.authorizationCodeGrantFailed);
+        }
     }
 
     /*
@@ -310,6 +346,6 @@ export class AuthenticatorImpl implements Authenticator {
      * Ensure that the this parameter is available in async callbacks
      */
     private _setupCallbacks() {
-        this._swapAuthorizationCodeForTokens = this._swapAuthorizationCodeForTokens.bind(this);
+        this._endLogin = this._endLogin.bind(this);
     }
 }

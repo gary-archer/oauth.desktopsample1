@@ -83,13 +83,11 @@ export class LoopbackWebServer {
      */
     private _handleBrowserRequest(request: Http.IncomingMessage, response: Http.ServerResponse): void {
 
-        console.log('*** DEBUG RECEIVED RESPONSE');
         if (!request.url) {
             return;
         }
 
         const url = this._tryParseUrl(request);
-        console.log(url);
         if (url) {
 
             // Ask the state object to handle the response based on the state parameter returned

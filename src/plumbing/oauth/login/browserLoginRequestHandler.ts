@@ -86,13 +86,14 @@ export class BrowserLoginRequestHandler extends AuthorizationRequestHandler {
 
         if (error) {
 
-            // Handle error responses if required
+            // Handle error responses
             const errorDescription = args.get('error_description') || '';
             const errorJson = {
                 error,
                 error_description: errorDescription || '',
             };
             authorizationError = new AuthorizationError(errorJson);
+
         } else {
 
             // Create a success response containing the code, which we will next swap for tokens

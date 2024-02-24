@@ -130,7 +130,10 @@ export class App {
      * Load API data for the user info fragment
      */
     private async _loadUserInfo(): Promise<void> {
-        await this._titleView!.loadUserInfo(this._authenticator!, this._apiClient!);
+
+        if (this._authenticator?.isLoggedIn()) {
+            await this._titleView!.loadUserInfo(this._authenticator!, this._apiClient!);
+        }
     }
 
     /*
