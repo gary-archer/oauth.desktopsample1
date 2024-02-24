@@ -80,10 +80,16 @@ export class AuthenticatorImpl implements Authenticator {
     }
 
     /*
-     * Begin an authorization redirect when the user clicks the Sign In button
+     * Do the login work
      */
     public async login(): Promise<void> {
-        await this._startLogin();
+
+        const result = await this._startLogin();
+        if (result.error) {
+            throw ErrorFactory.getFromLoginOperation(result.error, ErrorCodes.loginResponseFailed);
+        }
+
+        await this._endLogin(result);
     }
 
     /*
@@ -159,7 +165,7 @@ export class AuthenticatorImpl implements Authenticator {
     /*
      * Do the work of starting a login redirect
      */
-    private async _startLogin(): Promise<void> {
+    private async _startLogin(): Promise<LoginRedirectResult> {
 
         try {
 
@@ -176,15 +182,7 @@ export class AuthenticatorImpl implements Authenticator {
                 this._configuration,
                 this._metadata!,
                 this._loginState);
-            const result = await adapter.login(redirectUri);
-
-            // Handle errors in the browser response
-            if (result.error) {
-                throw ErrorFactory.getFromLoginOperation(result.error, ErrorCodes.loginResponseFailed);
-            }
-
-            // Swap the authorization code for tokens
-            await this._endLogin(result, redirectUri);
+            return await adapter.login(redirectUri);
 
         } catch (e: any) {
 
@@ -196,7 +194,7 @@ export class AuthenticatorImpl implements Authenticator {
     /*
      * Swap the authorizasion code for a refresh token and access token
      */
-    private async _endLogin(result: LoginRedirectResult, redirectUri: string): Promise<void> {
+    private async _endLogin(result: LoginRedirectResult): Promise<void> {
 
         try {
 
@@ -212,7 +210,7 @@ export class AuthenticatorImpl implements Authenticator {
             const requestJson = {
                 grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
                 code: result.response!.code,
-                redirect_uri: redirectUri,
+                redirect_uri: result.request.redirectUri,
                 client_id: this._configuration.clientId,
                 extras,
             };
