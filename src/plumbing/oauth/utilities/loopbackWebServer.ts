@@ -1,7 +1,6 @@
 
 import FindFreePort from 'find-free-port';
 import Http from 'http';
-import Url from 'url';
 import {OAuthConfiguration} from '../../../configuration/oauthConfiguration';
 import {LoginState} from '../login/loginState';
 
@@ -84,44 +83,46 @@ export class LoopbackWebServer {
      */
     private _handleBrowserRequest(request: Http.IncomingMessage, response: Http.ServerResponse): void {
 
+        console.log('*** DEBUG RECEIVED RESPONSE');
         if (!request.url) {
             return;
         }
 
-        // First get query params
-        const parsedUrl = this._tryParseUrl(request.url);
-        if (!parsedUrl) {
-            return;
+        const url = this._tryParseUrl(request);
+        console.log(url);
+        if (url) {
+
+            // Ask the state object to handle the response based on the state parameter returned
+            const args = new URLSearchParams(url.search);
+            this._loginState.handleLoginResponse(args);
+
+            // Calculate the post login location, and forward errors if required
+            let postLoginUrl = this._oauthConfig.postLoginPage;
+            const error = args.get('error');
+            if (error) {
+                postLoginUrl += `?error=${error}`;
+            }
+
+            // Redirect to the post login location
+            response.writeHead(301, {
+                Location: postLoginUrl,
+            });
+            response.end();
+
+            // Stop the web server now that the login attempt has finished
+            LoopbackWebServer._server!.close();
+            LoopbackWebServer._server = null;
+            LoopbackWebServer._runtimePort = 0;
         }
-
-        // Ask the state object to handle the response based on the state parameter returned
-        this._loginState.handleLoginResponse(parsedUrl.query);
-
-        // Calculate the post login location, and forward errors if required
-        let postLoginUrl = this._oauthConfig.postLoginPage;
-        if (parsedUrl.query.error) {
-            postLoginUrl += `?error=${parsedUrl.query.error}`;
-        }
-
-        // Redirect to the post login location
-        response.writeHead(301, {
-            Location: postLoginUrl,
-        });
-        response.end();
-
-        // Stop the web server now that the login attempt has finished
-        LoopbackWebServer._server!.close();
-        LoopbackWebServer._server = null;
-        LoopbackWebServer._runtimePort = 0;
     }
 
     /*
-     * Private URI scheme notifications could provide malformed input, so parse them safely
+     * External notifications could provide malformed input, so parse them safely
      */
-    private _tryParseUrl(url: string): Url.UrlWithParsedQuery | null {
+    private _tryParseUrl(request: Http.IncomingMessage): URL | null {
 
         try {
-            return Url.parse(url, true);
+            return new URL(request.url || '', `http://${request.headers.host}`);
         } catch (e: any) {
             return null;
         }
