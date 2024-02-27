@@ -2,8 +2,7 @@
  * The Electron main process, which loads the renderer process app.ts
  */
 
-import {app, BrowserWindow, ipcMain, Menu, session, shell} from 'electron';
-import DefaultMenu from 'electron-default-menu';
+import {app, BrowserWindow, ipcMain, session} from 'electron';
 import {ApplicationEventNames} from './plumbing/events/applicationEventNames.js';
 
 /*
@@ -51,10 +50,6 @@ class Main {
                 contextIsolation: false,
             },
         });
-
-        // Ensure that our window has its own menu after Electron Packager has run
-        const menu = DefaultMenu(app, shell);
-        Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
 
         // Load the index.html of the app from the file system
         this._window.loadFile('./index.html');
