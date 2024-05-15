@@ -6,7 +6,7 @@
 
 ## Overview
 
-* The initial OpenID Connect desktop code sample, referenced in my blog at https://authguidance.com
+* The initial OpenID Connect desktop code sample
 * **The goal is to implement OpenID Connect in a desktop app with good usability and reliability**
 
 ## Views
@@ -40,7 +40,7 @@ You can then test logins, API calls and token renewal:
 
 ## Further Information
 
-- Further architecture details are described starting in the [Initial Desktop Sample Overview](https://authguidance.com/2018/01/11/desktop-apps-overview/).
+- Further architecture details are described starting in the [Initial Desktop Sample Overview](https://apisandclients.com/posts/desktop-apps-overview).
 - See the [Final Desktop Sample](https://github.com/gary-archer/oauth.desktopsample.final) for a more complete code sample.
 
 ## Programming Languages
