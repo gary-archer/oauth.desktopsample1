@@ -63,3 +63,10 @@ if [ $? -ne 0 ]; then
   echo 'Problem encountered running the desktop app'
   exit
 fi
+
+#
+# You may also need to run these commands on Linux
+# https://github.com/electron/electron/issues/17972
+#
+# sudo chown root node_modules/electron/dist/chrome-sandbox
+# sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
