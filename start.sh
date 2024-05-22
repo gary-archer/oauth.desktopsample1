@@ -26,14 +26,24 @@ case "$(uname -s)" in
 	;;
 esac
 
-#
-# Download dependencies
-#
 if [ ! -d 'node_modules' ]; then
+  
+  #
+  # Download dependencies
+  #
   npm install
   if [ $? -ne 0 ]; then
     echo 'Problem encountered downloading dependencies'
     exit
+  fi
+
+  #
+  # On my Ubuntu 24 system I also need to run these commands
+  # https://github.com/electron/electron/issues/17972
+  #
+  if [ "$PLATFORM" == 'LINUX' ]; then
+    sudo chown root node_modules/electron/dist/chrome-sandbox
+    sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
   fi
 fi
 
@@ -63,10 +73,3 @@ if [ $? -ne 0 ]; then
   echo 'Problem encountered running the desktop app'
   exit
 fi
-
-#
-# You may also need to run these commands on Linux
-# https://github.com/electron/electron/issues/17972
-#
-# sudo chown root node_modules/electron/dist/chrome-sandbox
-# sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
