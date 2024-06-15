@@ -47,7 +47,7 @@ export class HeaderButtonsView {
                     <button id='btnExpireRefreshToken' type='button' disabled class='btn btn-primary w-100 p-1 sessionbutton'>Expire Refresh Token</button>
                 </div>
                 <div class='col col-one-fifth my-2 d-flex p-1'>
-                    <button id='btnLogout' type='button' disabled class='btn btn-primary w-100 p-1 sessionbutton'>Logout</button>
+                    <button id='btnLogout' type='button' disabled class='btn btn-primary w-100 p-1 sessionbutton'>Sign Out</button>
                 </div>
             </div>`;
         DomUtils.html('#headerbuttons', html);
@@ -58,6 +58,13 @@ export class HeaderButtonsView {
         DomUtils.onClick('#btnExpireAccessToken', this._onExpireAccessToken);
         DomUtils.onClick('#btnExpireRefreshToken', this._onExpireRefreshToken);
         DomUtils.onClick('#btnLogout', this._onLogout);
+    }
+
+    /*
+     * Update the home button to display Sign In when not authenticated yet
+     */
+    public setIsAuthenticated(isAuthenticated: boolean): void {
+        DomUtils.text('#btnHome', isAuthenticated ? 'Home' : 'Sign In');
     }
 
     /*
