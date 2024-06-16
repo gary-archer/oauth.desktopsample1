@@ -34,7 +34,7 @@ You can login to the desktop app using my AWS Cognito test account.\
 You can then test logins, API calls and token renewal:
 
 ```text
-- User: guestuser@mycompany.com
+- User: guestuser@example.com
 - Password: GuestPassword1
 ```
 
