@@ -5,7 +5,6 @@ import {
     GRANT_TYPE_REFRESH_TOKEN,
     StringMap,
     TokenRequest} from '@openid/appauth';
-import axios, {AxiosRequestConfig} from 'axios';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {ErrorCodes} from '../errors/errorCodes';
 import {ErrorFactory} from '../errors/errorFactory';
@@ -13,15 +12,14 @@ import {Authenticator} from './authenticator';
 import {LoginAsyncAdapter} from './login/loginAsyncAdapter';
 import {LoginRedirectResult} from './login/loginRedirectResult';
 import {LoginState} from './login/loginState';
-import {OAuthUserInfo} from './oauthUserInfo';
 import {TokenData} from './tokenData';
-import {AxiosUtils} from '../utilities/axiosUtils';
 import {CustomRequestor} from './utilities/customRequestor';
 import {LoopbackWebServer} from './utilities/loopbackWebServer';
 
 /*
  * The entry point class for login and token requests
  */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 export class AuthenticatorImpl implements Authenticator {
 
     private readonly _configuration: OAuthConfiguration;
@@ -80,6 +78,13 @@ export class AuthenticatorImpl implements Authenticator {
     }
 
     /*
+     * Return the URL to the userinfo endpoint when requested
+     */
+    public getUserInfoEndpoint(): string {
+        return this._metadata?.userInfoEndpoint || '';
+    }
+
+    /*
      * Do the login work
      */
     public async login(): Promise<void> {
@@ -97,34 +102,6 @@ export class AuthenticatorImpl implements Authenticator {
      */
     public logout(): void {
         this._resetDataOnLogout();
-    }
-
-    /*
-     * Get user info from the authorization server and handle retries with a refreshed access token
-     */
-    public async getUserInfo(): Promise<OAuthUserInfo> {
-
-        let accessToken = await this.getAccessToken();
-
-        try {
-
-            // Download metadata from the Authorization server if required
-            await this._loadMetadata();
-
-            // Call the API
-            return await this._makeUserInfoRequest(accessToken!);
-
-        } catch (e: any) {
-
-            // Report Ajax errors if this is not a 401
-            if (e.statusCode !== 401) {
-                throw e;
-            }
-
-            // If we received a 401 then try to get a new token
-            accessToken = await this.refreshAccessToken();
-            return await this._makeUserInfoRequest(accessToken!);
-        }
     }
 
     /*
@@ -300,36 +277,6 @@ export class AuthenticatorImpl implements Authenticator {
                 // Report unexpected errors
                 throw ErrorFactory.getFromTokenError(e, ErrorCodes.tokenRefreshFailed);
             }
-        }
-    }
-
-    /*
-     * Download user attributes from the authorization server
-     */
-    public async _makeUserInfoRequest(accessToken: string): Promise<OAuthUserInfo> {
-
-        try {
-
-            const options = {
-                url: this._metadata!.userInfoEndpoint!,
-                method: 'GET',
-                headers: {
-                    'accept': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
-                },
-            };
-
-            const response = await axios.request(options as AxiosRequestConfig);
-            AxiosUtils.checkJson(response.data);
-
-            return {
-                givenName: response.data['given_name'] || '',
-                familyName: response.data['family_name'] || '',
-            };
-
-        } catch (e: any) {
-
-            throw ErrorFactory.getFromHttpError(e, this._metadata!.userInfoEndpoint!, 'authorization server');
         }
     }
 

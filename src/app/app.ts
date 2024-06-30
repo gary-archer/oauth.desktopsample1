@@ -16,13 +16,13 @@ import {TitleView} from '../views/titleView';
  */
 export class App {
 
-    private _configuration?: Configuration;
-    private _authenticator?: Authenticator;
-    private _apiClient?: ApiClient;
-    private _router?: Router;
-    private _titleView?: TitleView;
-    private _headerButtonsView?: HeaderButtonsView;
-    private _errorView?: ErrorView;
+    private _configuration!: Configuration;
+    private _authenticator!: Authenticator;
+    private _apiClient!: ApiClient;
+    private _router!: Router;
+    private _titleView!: TitleView;
+    private _headerButtonsView!: HeaderButtonsView;
+    private _errorView!: ErrorView;
     private _isInitialised: boolean;
 
     public constructor() {
@@ -51,14 +51,14 @@ export class App {
             await this._loadMainView();
 
             // Get user info from the API unless we are in the login required view
-            if (!this._router!.isInLoginRequiredView()) {
+            if (!this._router.isInLoginRequiredView()) {
                 await this._loadUserInfo();
             }
 
         } catch (e: any) {
 
             // Render the error view if there are problems
-            this._errorView?.report(e);
+            this._errorView.report(e);
         }
     }
 
@@ -94,7 +94,7 @@ export class App {
         this._authenticator = new AuthenticatorImpl(this._configuration.oauth);
 
         // Create a client to reliably call the API
-        this._apiClient = new ApiClient(this._configuration.app.apiBaseUrl, this._authenticator);
+        this._apiClient = new ApiClient(this._configuration, this._authenticator);
 
         // Create our simple router class
         this._router = new Router(this._apiClient);
@@ -109,22 +109,22 @@ export class App {
     private async _loadMainView(): Promise<void> {
 
         // Indicate busy
-        this._headerButtonsView!.disableSessionButtons();
+        this._headerButtonsView.disableSessionButtons();
 
         // Load the view
-        await this._router!.loadView();
+        await this._router.loadView();
 
-        if (this._router!.isInLoginRequiredView()) {
+        if (this._router.isInLoginRequiredView()) {
 
             // If we are logged out then clear user info
-            this._headerButtonsView!.setIsAuthenticated(false);
-            this._titleView!.clearUserInfo();
+            this._headerButtonsView.setIsAuthenticated(false);
+            this._titleView.clearUserInfo();
 
         } else {
 
             // Otherwise re-enable buttons
-            this._headerButtonsView!.setIsAuthenticated(true);
-            this._headerButtonsView!.enableSessionButtons();
+            this._headerButtonsView.setIsAuthenticated(true);
+            this._headerButtonsView.enableSessionButtons();
         }
     }
 
@@ -133,8 +133,8 @@ export class App {
      */
     private async _loadUserInfo(): Promise<void> {
 
-        if (this._authenticator?.isLoggedIn()) {
-            await this._titleView!.loadUserInfo(this._authenticator!, this._apiClient!);
+        if (this._authenticator.isLoggedIn()) {
+            await this._titleView.loadUserInfo(this._apiClient);
         }
     }
 
@@ -153,7 +153,7 @@ export class App {
         } catch (e: any) {
 
             // Report failures
-            this._errorView!.report(e);
+            this._errorView.report(e);
         }
     }
 
@@ -171,14 +171,14 @@ export class App {
 
             if (this._isInitialised) {
 
-                if (this._router!.isInLoginRequiredView()) {
+                if (this._router.isInLoginRequiredView()) {
 
                     // We login when home is clicked in the Login Required view
                     await this._login();
 
                 } else {
 
-                    if (this._router!.isInHomeView()) {
+                    if (this._router.isInHomeView()) {
 
                         // Force a reload if we are already in the home view
                         await this._loadMainView();
@@ -194,7 +194,7 @@ export class App {
         } catch (e: any) {
 
             // Report any errors
-            this._errorView!.report(e);
+            this._errorView.report(e);
         }
     }
 
@@ -206,8 +206,8 @@ export class App {
         try {
 
             // Do the work of the login
-            this._router!.getLoginRequiredView().showProgress();
-            await this._authenticator?.login();
+            this._router.getLoginRequiredView().showProgress();
+            await this._authenticator.login();
 
             // Move back to the location that took us to login required
             LoginNavigation.restorePreLoginLocation();
@@ -215,8 +215,8 @@ export class App {
         } catch (e: any) {
 
             // Hide progress and output errors
-            this._router!.getLoginRequiredView().hideProgress();
-            this._errorView!.report(e);
+            this._router.getLoginRequiredView().hideProgress();
+            this._errorView.report(e);
 
         } finally {
 
@@ -232,7 +232,7 @@ export class App {
         } catch (e: any) {
 
             // Report user info load errors
-            this._errorView!.report(e);
+            this._errorView.report(e);
         }
     }
 
@@ -250,7 +250,7 @@ export class App {
         } catch (e: any) {
 
             // Report reload errors
-            this._errorView!.report(e);
+            this._errorView.report(e);
         }
     }
 
@@ -260,7 +260,7 @@ export class App {
     private async _onLogout(): Promise<void> {
 
         // The basic logout for this sample just removes tokens
-        this._authenticator!.logout();
+        this._authenticator.logout();
 
         // Navigate to the logged out view
         location.hash = '#loggedout';
@@ -270,14 +270,14 @@ export class App {
      * Force a new access token to be retrieved
      */
     private async _onExpireAccessToken(): Promise<void> {
-        await this._authenticator!.expireAccessToken();
+        await this._authenticator.expireAccessToken();
     }
 
     /*
      * Force the next refresh token request to fail
      */
     private async _onExpireRefreshToken(): Promise<void> {
-        await this._authenticator!.expireRefreshToken();
+        await this._authenticator.expireRefreshToken();
     }
 
     /*

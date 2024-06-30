@@ -4,6 +4,8 @@ import {Authenticator} from '../../plumbing/oauth/authenticator';
 import {ApiUserInfo} from '../entities/apiUserInfo';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
+import {Configuration} from '../../configuration/configuration';
+import {OAuthUserInfo} from '../../plumbing/oauth/oauthUserInfo';
 import {AxiosUtils} from '../../plumbing/utilities/axiosUtils';
 
 /*
@@ -11,16 +13,11 @@ import {AxiosUtils} from '../../plumbing/utilities/axiosUtils';
  */
 export class ApiClient {
 
-    private readonly _apiBaseUrl: string;
+    private readonly _configuration: Configuration;
     private readonly _authenticator: Authenticator;
 
-    public constructor(apiBaseUrl: string, authenticator: Authenticator) {
-
-        this._apiBaseUrl = apiBaseUrl;
-        if (!this._apiBaseUrl.endsWith('/')) {
-            this._apiBaseUrl += '/';
-        }
-
+    public constructor(configuration: Configuration, authenticator: Authenticator) {
+        this._configuration = configuration;
         this._authenticator = authenticator;
     }
 
@@ -29,7 +26,8 @@ export class ApiClient {
      */
     public async getCompanyList(): Promise<Company[]> {
 
-        return await this._callApi('companies', 'GET') as Company[];
+        const url = `${this._configuration.app.apiBaseUrl}/companies`;
+        return await this._callApi(url, 'GET') as Company[];
     }
 
     /*
@@ -37,24 +35,35 @@ export class ApiClient {
      */
     public async getCompanyTransactions(id: string): Promise<CompanyTransactions> {
 
-        return await this._callApi(`companies/${id}/transactions`, 'GET') as CompanyTransactions;
+        const url = `${this._configuration.app.apiBaseUrl}/companies/${id}/transactions`;
+        return await this._callApi(url, 'GET') as CompanyTransactions;
     }
 
     /*
-     * The front end gets domain specific user info from its API
+     * The front end gets OAuth user info from the authorization server
      */
-    public async getUserInfo(): Promise<ApiUserInfo> {
+    public async getOAuthUserInfo(): Promise<OAuthUserInfo> {
 
-        return await this._callApi('userinfo', 'GET') as ApiUserInfo;
+        const data = await this._callApi(this._authenticator.getUserInfoEndpoint(), 'GET');
+        return {
+            givenName: data['given_name'] || '',
+            familyName: data['family_name'] || '',
+        };
+    }
+
+    /*
+     * The front end gets other user information from its API
+     */
+    public async getApiUserInfo(): Promise<ApiUserInfo> {
+
+        const url = `${this._configuration.app.apiBaseUrl}/userinfo`;
+        return await this._callApi(url, 'GET') as ApiUserInfo;
     }
 
     /*
      * A central method to get data from an API and handle 401 retries
      */
-    private async _callApi(path: string, method: Method, dataToSend?: any): Promise<any> {
-
-        // Get the full path
-        const url = `${this._apiBaseUrl}${path}`;
+    private async _callApi(url: string, method: Method, dataToSend?: any): Promise<any> {
 
         // Get the access token, and if it does not exist a login redirect will be triggered
         let token = await this._authenticator.getAccessToken();

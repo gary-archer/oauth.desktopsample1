@@ -99,7 +99,7 @@ class Main {
      * When a login response is received, bring our window to the foreground
      */
     private _bringToForeground(): void {
-        this._window!.show();
+        this._window?.show();
     }
 
     /*

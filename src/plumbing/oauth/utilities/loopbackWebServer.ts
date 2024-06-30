@@ -108,7 +108,7 @@ export class LoopbackWebServer {
             response.end();
 
             // Stop the web server now that the login attempt has finished
-            LoopbackWebServer._server!.close();
+            LoopbackWebServer._server?.close();
             LoopbackWebServer._server = null;
             LoopbackWebServer._runtimePort = 0;
         }
