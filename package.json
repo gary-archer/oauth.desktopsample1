@@ -28,19 +28,14 @@
     "opener": "^1.5.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.5.0",
+    "@eslint/js": "^9.8.0",
     "@types/eslint__js": "^8.42.3",
     "@types/fs-extra": "^11.0.4",
     "@types/mustache": "^4.2.5",
     "@types/node": "^20.11.30",
     "electron": "^31.1.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.8.0",
     "typescript": "^5.5.2",
-    "typescript-eslint": "^7.14.1"
-  },
-  "overrides": {
-    "eslint": {
-      "file-entry-cache": "8.x"
-    }
+    "typescript-eslint": "^8.0.0"
   }
 }

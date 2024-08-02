@@ -121,7 +121,7 @@ export class LoopbackWebServer {
 
         try {
             return new URL(request.url || '', `http://${request.headers.host}`);
-        } catch (e: any) {
+        } catch {
             return null;
         }
     }
