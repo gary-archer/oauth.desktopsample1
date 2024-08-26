@@ -1,0 +1,41 @@
+{
+  "name": "basicdesktopapp",
+  "version": "1.0.0",
+  "description": "An OpenID Connect secured Desktop App using the AppAuth-JS security",
+  "keywords": [],
+  "author": "Gary Archer",
+  "license": "MIT",
+  "main": "built/main.js",
+  "type": "commonjs",
+  "files": [
+    "built/**"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "lint": "npx eslint . --ignore-pattern built",
+    "build": "rm -rf built && tsc",
+    "start": "./start.sh",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@openid/appauth": "^1.3.1",
+    "axios": "^1.7.4",
+    "find-free-port": "^2.0.0",
+    "fs-extra": "^11.2.0",
+    "mustache": "^4.2.0",
+    "opener": "^1.5.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.8.0",
+    "@types/eslint__js": "^8.42.3",
+    "@types/fs-extra": "^11.0.4",
+    "@types/mustache": "^4.2.5",
+    "@types/node": "^20.11.30",
+    "electron": "^31.4.0",
+    "eslint": "^9.8.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.0"
+  }
+}
