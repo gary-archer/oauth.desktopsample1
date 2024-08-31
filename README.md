@@ -38,7 +38,7 @@ You can login to the desktop app using my AWS Cognito test account:
 ```
 
 The app receives the login response using a loopback redirect URI.\
-After login you can test some basic lifecycle operations, though its session management is intentionally incomplete.
+After login you can test some basic lifecycle operations, though session management is incomplete.
 
 ## Further Information
 
