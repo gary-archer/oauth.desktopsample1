@@ -52,5 +52,5 @@ After login you can test some basic lifecycle operations, though session managem
 ## Infrastructure
 
 * The [AppAuth-JS](https://github.com/openid/AppAuth-JS/blob/master/README.md) library is used to implement the code flow with PKCE.
-* [AWS Serverless](https://github.com/gary-archer/oauth.apisample.serverless) or Kubernetes is used to host remote API endpoints that the app calls.
+* [AWS Serverless](https://github.com/gary-archer/oauth.apisample.serverless) or Kubernetes host remote API endpoints that the app calls.
 * AWS Cognito is used as the default authorization server for the desktop app and API.
