@@ -44,6 +44,15 @@ if [ ! -d 'node_modules' ]; then
 fi
 
 #
+# Copy deployable assets that are not Javascript bundles
+#
+if [ -d 'dist' ]; then
+  rm -rf dist
+fi
+mkdir dist
+cp index.html desktop.config.json *.css package.json src/preload.js dist
+
+#
 # Check code quality
 #
 npm run lint
@@ -64,7 +73,7 @@ fi
 #
 # Run differently depending on the platform
 #
-npx electron .
+npx electron ./dist
 if [ $? -ne 0 ]; then
   echo 'Problem encountered running the desktop app'
   exit
