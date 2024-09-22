@@ -1,4 +1,4 @@
-import {App} from './app/app';
+import {App} from './renderer/app/app';
 
 /*
  * The renderer process runs the application class

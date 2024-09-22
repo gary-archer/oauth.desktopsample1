@@ -2,18 +2,24 @@
  * The Electron main process, which loads the renderer process app.ts
  */
 
-import {app, BrowserWindow, ipcMain, session} from 'electron';
+import {app, BrowserWindow, session} from 'electron';
 import path from 'path';
-import {ApplicationEventNames} from './plumbing/events/applicationEventNames';
+import {Configuration} from './main/configuration/configuration';
+import {ConfigurationLoader} from './main/configuration/configurationLoader';
+import {IpcMainEvents} from './main/ipcMainEvents';
 
 /*
  * The Electron main process entry point
  */
 class Main {
 
+    private _configuration: Configuration;
+    private _ipcEvents: IpcMainEvents;
     private _window: BrowserWindow | null;
 
     public constructor() {
+        this._configuration = ConfigurationLoader.load(`${app.getAppPath()}/desktop.config.json`);
+        this._ipcEvents = new IpcMainEvents(this._configuration);
         this._window = null;
         this._setupCallbacks();
     }
@@ -40,7 +46,8 @@ class Main {
     private _createMainWindow(): void {
 
         // Create the browser window
-        // Note that node integration is needed in order to use 'require' in index.html
+        // Create the window and use Electron recommended security options
+        // https://www.electronjs.org/docs/tutorial/security
         this._window = new BrowserWindow({
             width: 1280,
             height: 720,
@@ -54,14 +61,14 @@ class Main {
             },
         });
 
+        // Register for event based communication with the renderer process
+        this._ipcEvents.register(this._window);
+
         // Load the index.html of the app from the file system
         this._window.loadFile('./index.html');
 
         // Configure HTTP headers
-        this._initialiseOutgoingHttpRequestHeaders();
-
-        // Register to be returned to the foreground once login completes
-        ipcMain.on(ApplicationEventNames.ON_LOGIN_REACTIVATE, this._bringToForeground);
+        this._initialiseHttpHeaders();
 
         // Emitted when the window is closed
         this._window.on('closed', this._onClosed);
@@ -79,27 +86,43 @@ class Main {
     }
 
     /*
-     * Remove the 'Origin: file://' deault header which may be rejected for security reasons with this message
-     * 'Browser requests to the token endpoint must be part of at least one whitelisted redirect_uri'
+     * Set required or recommended headers
      */
-    private _initialiseOutgoingHttpRequestHeaders() {
+    private _initialiseHttpHeaders() {
 
-        const headerCallback = (details: any, callback: any) => {
+        // Remove the 'Origin: file://' default header which may be rejected for security reasons with this message
+        // 'Browser requests to the token endpoint must be part of at least one whitelisted redirect_uri'
+        session.defaultSession.webRequest.onBeforeSendHeaders({urls: []} as any, (details, callback) => {
 
             if (details.requestHeaders.Origin) {
                 delete details.requestHeaders.Origin;
             }
 
             callback({cancel: false, requestHeaders: details.requestHeaders});
-        };
-        session.defaultSession.webRequest.onBeforeSendHeaders({urls: []} as any, headerCallback);
-    }
+        });
 
-    /*
-     * When a login response is received, bring our window to the foreground
-     */
-    private _bringToForeground(): void {
-        this._window?.show();
+        // Set a content security policy as a security best practice unless temporarily disabled
+        session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+
+            let policy = '';
+            policy += "default-src 'none';";
+            policy += " script-src 'self';";
+            policy += " connect-src 'self'";
+            policy += " child-src 'self';";
+            policy += " img-src 'self';";
+            policy += " style-src 'self';";
+            policy += " object-src 'none';";
+            policy += " frame-ancestors 'none';";
+            policy += " base-uri 'self';";
+            policy += " form-action 'self'";
+        
+            callback({
+                responseHeaders: {
+                    ...details.responseHeaders,
+                    'Content-Security-Policy': [policy],
+                },
+            });
+        });
     }
 
     /*
@@ -128,7 +151,6 @@ class Main {
     private _setupCallbacks() {
         this._createMainWindow = this._createMainWindow.bind(this);
         this._onActivate = this._onActivate.bind(this);
-        this._bringToForeground = this._bringToForeground.bind(this);
         this._onClosed = this._onClosed.bind(this);
         this._onAllWindowsClosed = this._onAllWindowsClosed.bind(this);
     }
