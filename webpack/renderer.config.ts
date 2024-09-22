@@ -26,8 +26,8 @@ const config: webpack.Configuration = {
     module: {
         rules: [
             {
-                // Files with a .ts or .tsx extension are loaded by the Typescript loader
-                test: /\.(ts|tsx)$/,
+                // Files with a .ts extension are loaded by the Typescript loader
+                test: /\.(ts)$/,
                 use: [{
                     loader: 'ts-loader',
                     options: {
