@@ -2,6 +2,7 @@ import {
     AuthorizationError,
     AuthorizationNotifier,
     AuthorizationRequest,
+    AuthorizationRequestJson,
     AuthorizationResponse,
     AuthorizationServiceConfiguration} from '@openid/appauth';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
@@ -35,13 +36,17 @@ export class LoginAsyncAdapter {
      */
     public async login(redirectUri: string): Promise<LoginRedirectResult> {
 
-        // Create the authorization request
+        // Create the authorization request and use prompt=login to force a new login
+        // Note however that AWS Cognito does not support that parameter
         const requestJson = {
             response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
             client_id: this._configuration.clientId,
             redirect_uri: redirectUri,
             scope: this._configuration.scope,
-        };
+            extras: {
+                'prompt': 'login',
+            },
+        } as AuthorizationRequestJson;
         const authorizationRequest = new AuthorizationRequest(requestJson, new NodeCrypto(), true);
 
         // Set up PKCE for the redirect, which avoids native app vulnerabilities
