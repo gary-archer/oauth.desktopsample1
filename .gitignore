@@ -1,5 +1,4 @@
 .gitignore
 node_modules
-built
 dist
 .DS_Store

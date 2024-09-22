@@ -3,7 +3,8 @@
  */
 
 import {app, BrowserWindow, ipcMain, session} from 'electron';
-import {ApplicationEventNames} from './plumbing/events/applicationEventNames.js';
+import path from 'path';
+import {ApplicationEventNames} from './plumbing/events/applicationEventNames';
 
 /*
  * The Electron main process entry point
@@ -46,8 +47,10 @@ class Main {
             minWidth: 800,
             minHeight: 600,
             webPreferences: {
-                nodeIntegration: true,
-                contextIsolation: false,
+                nodeIntegration: false,
+                contextIsolation: true,
+                sandbox: true,
+                preload: path.join(app.getAppPath(), './preload.js'),
             },
         });
 
@@ -62,9 +65,6 @@ class Main {
 
         // Emitted when the window is closed
         this._window.on('closed', this._onClosed);
-
-        // Open the developer tools at startup if required
-        // this._window.webContents.openDevTools();
     }
 
     /*
