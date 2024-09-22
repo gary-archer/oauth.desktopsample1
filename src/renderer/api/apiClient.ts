@@ -1,128 +1,76 @@
-import axios, {Method} from 'axios';
-import {ErrorFactory} from '../../plumbing/errors/errorFactory';
-import {Authenticator} from '../../plumbing/oauth/authenticator';
-import {ApiUserInfo} from '../entities/apiUserInfo';
-import {Company} from '../entities/company';
-import {CompanyTransactions} from '../entities/companyTransactions';
-import {Configuration} from '../../configuration/configuration';
-import {OAuthUserInfo} from '../../plumbing/oauth/oauthUserInfo';
-import {AxiosUtils} from '../../plumbing/utilities/axiosUtils';
+import {ApiUserInfo} from '../../shared/api/apiUserInfo';
+import {Company} from '../../shared/api/company';
+import {CompanyTransactions} from '../../shared/api/companyTransactions';
+import {OAuthUserInfo} from '../../shared/api/oauthUserInfo';
+import {ErrorFactory} from '../../shared/errors/errorFactory';
+import {IpcRendererEvents} from '../ipcRendererEvents';
+import {AuthenticatorClient} from '../oauth/authenticatorClient';
 
 /*
- * Logic related to making API calls
+ * API operations from the renderer side of the app
  */
 export class ApiClient {
 
-    private readonly _configuration: Configuration;
-    private readonly _authenticator: Authenticator;
+    private readonly _ipcEvents: IpcRendererEvents;
+    private readonly _authenticatorClient: AuthenticatorClient;
 
-    public constructor(configuration: Configuration, authenticator: Authenticator) {
-        this._configuration = configuration;
-        this._authenticator = authenticator;
+    public constructor(ipcEvents: IpcRendererEvents, authenticatorClient: AuthenticatorClient) {
+
+        this._ipcEvents = ipcEvents;
+        this._authenticatorClient = authenticatorClient;
     }
 
     /*
      * Get a list of companies
      */
-    public async getCompanyList(): Promise<Company[]> {
-
-        const url = `${this._configuration.app.apiBaseUrl}/companies`;
-        return await this._callApi(url, 'GET') as Company[];
+    public async getCompanyList() : Promise<Company[]> {
+        return await this._getDataFromApi(this._ipcEvents.getCompanyList);
     }
 
     /*
      * Get a list of transactions for a single company
      */
-    public async getCompanyTransactions(id: string): Promise<CompanyTransactions> {
-
-        const url = `${this._configuration.app.apiBaseUrl}/companies/${id}/transactions`;
-        return await this._callApi(url, 'GET') as CompanyTransactions;
+    public async getCompanyTransactions(id: string) : Promise<CompanyTransactions> {
+        return await this._getDataFromApi(() => this._ipcEvents.getCompanyTransactions(id));
     }
 
     /*
-     * The front end gets OAuth user info from the authorization server
+     * Get user information from the authorization server
      */
-    public async getOAuthUserInfo(): Promise<OAuthUserInfo> {
-
-        const data = await this._callApi(this._authenticator.getUserInfoEndpoint(), 'GET');
-        return {
-            givenName: data['given_name'] || '',
-            familyName: data['family_name'] || '',
-        };
+    public async getOAuthUserInfo() : Promise<OAuthUserInfo> {
+        return await this._getDataFromApi(() => this._ipcEvents.getOAuthUserInfo());
     }
 
     /*
-     * The front end gets other user information from its API
+     * Download user attributes the UI needs that are not stored in the authorization server
      */
-    public async getApiUserInfo(): Promise<ApiUserInfo> {
-
-        const url = `${this._configuration.app.apiBaseUrl}/userinfo`;
-        return await this._callApi(url, 'GET') as ApiUserInfo;
+    public async getApiUserInfo() : Promise<ApiUserInfo> {
+        return await this._getDataFromApi(() => this._ipcEvents.getApiUserInfo());
     }
 
     /*
-     * A central method to get data from an API and handle 401 retries
+     * A parameterized method containing application specific logic for managing API calls
      */
-    private async _callApi(url: string, method: Method, dataToSend?: any): Promise<any> {
-
-        // Get the access token, and if it does not exist a login redirect will be triggered
-        let token = await this._authenticator.getAccessToken();
-        if (!token) {
-
-            // Throw an error that will navigate to the login required view
-            throw ErrorFactory.fromLoginRequired();
-        }
+    private async _getDataFromApi(callback: () => Promise<any>): Promise<any> {
 
         try {
 
-            // Call the API
-            return await this._callApiWithToken(url, method, dataToSend, token);
+            // Call the API and return data on success
+            return await callback();
 
-        } catch (e: any) {
+        } catch (e1: any) {
 
-            // Report Ajax errors if this is not a 401
-            if (e.statusCode !== 401) {
-                throw ErrorFactory.fromHttpError(e, url, 'web API');
+            // Report errors if this is not a 401
+            const error1 = ErrorFactory.fromException(e1);
+            if (error1.statusCode !== 401) {
+                throw error1;
             }
 
-            // If we received a 401 then try to refresh the access token
-            token = await this._authenticator.refreshAccessToken();
-            if (!token) {
+            // Try to refresh the access token stored on the main side of the app
+            await this._authenticatorClient.refreshAccessToken();
 
-                // Throw an error that will navigate to the login required view
-                throw ErrorFactory.fromLoginRequired();
-            }
-
-            // Call the API again
-            return await this._callApiWithToken(url, method, dataToSend, token);
-        }
-    }
-
-    /*
-     * Do the work of calling the API
-     */
-    private async _callApiWithToken(
-        url: string,
-        method: Method,
-        dataToSend: any,
-        accessToken: string): Promise<any> {
-
-        try {
-
-            const response = await axios.request({
-                url,
-                method,
-                data: dataToSend,
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                },
-            });
-
-            AxiosUtils.checkJson(response.data);
-            return response.data;
-
-        } catch (e: any) {
-            throw ErrorFactory.fromHttpError(e, url, 'web API');
+            // Call the API again with the new access token
+            return await callback();
         }
     }
 }

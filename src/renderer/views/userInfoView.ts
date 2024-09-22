@@ -1,5 +1,5 @@
 import mustache from 'mustache';
-import {ApiClient} from '../api/client/apiClient';
+import {ApiClient} from '../api/apiClient';
 import {DomUtils} from './domUtils';
 
 /*

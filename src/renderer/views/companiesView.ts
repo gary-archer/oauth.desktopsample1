@@ -1,6 +1,6 @@
 import mustache from 'mustache';
-import {ApiClient} from '../api/client/apiClient';
-import {Company} from '../api/entities/company';
+import {Company} from '../../shared/api/company';
+import {ApiClient} from '../api/apiClient';
 import {DomUtils} from './domUtils';
 
 /*

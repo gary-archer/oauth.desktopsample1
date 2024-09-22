@@ -6,17 +6,14 @@ export interface AuthenticatorClient {
     // See if logged in
     isLoggedIn(): Promise<boolean>;
 
+    // Ask the main process to refresh the access token when it expires
+    refreshAccessToken(): Promise<void>;
+
     // Do the login redirect and process the response
     login(): Promise<void>;
 
-    // Do the logout redirect and process the response
+    // Run the logout logic
     logout(): Promise<void>;
-
-    // Try to refresh the access token
-    synchronizedRefresh(): Promise<void>;
-
-    // Allow the app to clear its login state after certain errors
-    clearLoginState(): Promise<void>;
 
     // For testing, make the access token act expired
     expireAccessToken(): Promise<void>;

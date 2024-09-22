@@ -8,7 +8,7 @@ export class IpcRendererEvents {
 
     private readonly _api: any;
 
-    public constructor() {
+    public constructor(window: Window) {
         this._api = (window as any).api;
     }
 

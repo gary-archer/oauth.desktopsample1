@@ -1,7 +1,7 @@
 import mustache from 'mustache';
-import {ApiClient} from '../api/client/apiClient';
-import {CompanyTransactions} from '../api/entities/companyTransactions';
-import {ErrorCodes} from '../plumbing/errors/errorCodes';
+import {ApiClient} from '../api/apiClient';
+import {CompanyTransactions} from '../../shared/api/companyTransactions';
+import {ErrorCodes} from '../../shared/errors/errorCodes';
 import {DomUtils} from './domUtils';
 
 /*

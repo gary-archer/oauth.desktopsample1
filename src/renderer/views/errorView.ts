@@ -1,11 +1,11 @@
 import mustache from 'mustache';
-import {ErrorCodes} from '../plumbing/errors/errorCodes';
-import {ErrorFactory} from '../plumbing/errors/errorFactory';
-import {ErrorFormatter} from '../plumbing/errors/errorFormatter';
-import {ErrorLine} from '../plumbing/errors/errorLine';
-import {UIError} from '../plumbing/errors/uiError';
-import {LoginNavigation} from './loginNavigation';
+import {ErrorCodes} from '../../shared/errors/errorCodes';
+import {ErrorFactory} from '../../shared/errors/errorFactory';
+import {UIError} from '../../shared/errors/uiError';
+import {ErrorFormatter} from '../errors/errorFormatter';
+import {ErrorLine} from '../errors/errorLine';
 import {DomUtils} from './domUtils';
+import {LoginNavigation} from './loginNavigation';
 
 /*
  * The error view renders error details

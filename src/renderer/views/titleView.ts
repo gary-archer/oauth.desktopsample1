@@ -1,4 +1,4 @@
-import {ApiClient} from '../api/client/apiClient';
+import {ApiClient} from '../api/apiClient';
 import {UserInfoView} from './userInfoView';
 import {DomUtils} from './domUtils';
 
