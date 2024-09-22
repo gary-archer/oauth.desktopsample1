@@ -5,9 +5,9 @@ import {
     AuthorizationRequestResponse,
     AuthorizationResponse,
     AuthorizationServiceConfiguration,
-    BasicQueryStringUtils,
-    DefaultCrypto} from '@openid/appauth';
-import Opener from 'opener';
+    BasicQueryStringUtils} from '@openid/appauth';
+import open from 'open';
+import {NodeCrypto} from '../../utilities/nodeCrypto';
 import {LoginState} from './loginState';
 
 /*
@@ -23,7 +23,7 @@ export class BrowserLoginRequestHandler extends AuthorizationRequestHandler {
      */
     public constructor(state: LoginState) {
 
-        super(new BasicQueryStringUtils(), new DefaultCrypto());
+        super(new BasicQueryStringUtils(), new NodeCrypto());
         this._state = state;
         this._authorizationPromise = null;
     }
@@ -46,7 +46,7 @@ export class BrowserLoginRequestHandler extends AuthorizationRequestHandler {
                 resolve(response);
 
                 // Ask the base class to call our completeAuthorizationRequest
-                this.completeAuthorizationRequestIfPossible();
+                super.completeAuthorizationRequestIfPossible();
             };
 
             // Store login state so that we can receive the response
@@ -57,14 +57,13 @@ export class BrowserLoginRequestHandler extends AuthorizationRequestHandler {
         const loginUrl = this.buildRequestUrl(metadata, request);
 
         // Invoke the browser
-        Opener(loginUrl);
+        open(loginUrl);
     }
 
     /*
      * Return data back to the authenticator's notifier
      */
     protected async completeAuthorizationRequest(): Promise<AuthorizationRequestResponse | null> {
-
         return this._authorizationPromise;
     }
 

@@ -49,6 +49,14 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
     }
 
     /*
+     * Return the URL to the userinfo endpoint when requested
+     */
+    public async getUserInfoEndpoint(): Promise<string | null> {
+        await this._loadMetadata();
+        return this._metadata?.userInfoEndpoint || null;
+    }
+
+    /*
      * Try to get an existing access token
      */
     public async getAccessToken(): Promise<string | null> {
@@ -78,14 +86,6 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
         }
 
         return null;
-    }
-
-    /*
-     * Return the URL to the userinfo endpoint when requested
-     */
-    public async getUserInfoEndpoint(): Promise<string | null> {
-        await this._loadMetadata();
-        return this._metadata?.userInfoEndpoint || null;
     }
 
     /*
@@ -121,7 +121,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
 
     /*
      * This method is for testing only, to make the refresh token fail and act like it has expired
-     * The corrupted refresh token will be sent to the Authorization Server but rejected
+     * The corrupted refresh token will be sent to the authorization server but rejected
      */
     public async expireRefreshToken(): Promise<void> {
 
@@ -155,14 +155,15 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             const runtimePort = await server.start();
             const redirectUri = `http://${this._configuration.loopbackHostname}:${runtimePort}`;
 
-            // Download metadata from the Authorization server if required
+            // Download metadata from the authorization server if required
             await this._loadMetadata();
 
-            // Run a login on the system browser and get the result
+            // Run a login on the system browser and get the authorization code
             const adapter = new LoginAsyncAdapter(
                 this._configuration,
                 this._metadata!,
                 this._loginState);
+
             return await adapter.login(redirectUri);
 
         } catch (e: any) {
@@ -173,7 +174,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
     }
 
     /*
-     * Swap the authorizasion code for a refresh token and access token
+     * Swap the authorization code for a refresh token and access token
      */
     private async _endLogin(result: LoginRedirectResult): Promise<void> {
 
@@ -198,10 +199,10 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             const tokenRequest = new TokenRequest(requestJson);
 
             // Execute the request to swap the code for tokens
-            const tokenHandler = new BaseTokenRequestHandler(this._customRequestor);
+            const tokenRequestHandler = new BaseTokenRequestHandler(this._customRequestor);
 
             // Perform the authorization code grant exchange
-            const tokenResponse = await tokenHandler.performTokenRequest(this._metadata!, tokenRequest);
+            const tokenResponse = await tokenRequestHandler.performTokenRequest(this._metadata!, tokenRequest);
 
             // Set values from the response
             const newTokenData = {
@@ -216,7 +217,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
         } catch (e: any) {
 
             // Do error translation if required
-            ErrorFactory.fromTokenError(e, ErrorCodes.authorizationCodeGrantFailed);
+            throw ErrorFactory.fromTokenError(e, ErrorCodes.authorizationCodeGrantFailed);
         }
     }
 
@@ -227,7 +228,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
 
         try {
 
-            // Download metadata from the Authorization server if required
+            // Download metadata from the authorization server if required
             await this._loadMetadata();
 
             // Supply the scope for access tokens
@@ -246,8 +247,8 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             const tokenRequest = new TokenRequest(requestJson);
 
             // Execute the request to send the refresh token and get new tokens
-            const tokenHandler = new BaseTokenRequestHandler(this._customRequestor);
-            const tokenResponse = await tokenHandler.performTokenRequest(this._metadata!, tokenRequest);
+            const tokenRequestHandler = new BaseTokenRequestHandler(this._customRequestor);
+            const tokenResponse = await tokenRequestHandler.performTokenRequest(this._metadata!, tokenRequest);
 
             // Set values from the response, which may include a new rolling refresh token
             const newTokenData = {

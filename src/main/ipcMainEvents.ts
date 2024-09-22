@@ -1,5 +1,6 @@
 import {BrowserWindow, ipcMain, IpcMainInvokeEvent} from 'electron';
 import {ErrorFactory} from '../shared/errors/errorFactory';
+import {UIError} from '../shared/errors/uiError';
 import {IpcEventNames} from '../shared/ipcEventNames';
 import {ApiService} from './api/apiService';
 import {Configuration} from './configuration/configuration';
@@ -54,6 +55,7 @@ export class IpcMainEvents {
 
         return this._handleAsyncOperation(
             event,
+            IpcEventNames.ON_GET_COMPANIES,
             () => this._apiService.getCompanyList());
     }
 
@@ -64,6 +66,7 @@ export class IpcMainEvents {
 
         return this._handleAsyncOperation(
             event,
+            IpcEventNames.ON_GET_TRANSACTIONS,
             () => this._apiService.getCompanyTransactions(args.id));
     }
 
@@ -74,6 +77,7 @@ export class IpcMainEvents {
 
         return this._handleAsyncOperation(
             event,
+            IpcEventNames.ON_GET_OAUTH_USER_INFO,
             () => this._apiService.getOAuthUserInfo());
     }
 
@@ -84,6 +88,7 @@ export class IpcMainEvents {
 
         return this._handleAsyncOperation(
             event,
+            IpcEventNames.ON_GET_API_USER_INFO,
             () => this._apiService.getApiUserInfo());
     }
 
@@ -94,6 +99,7 @@ export class IpcMainEvents {
 
         return this._handleNonAsyncOperation(
             event,
+            IpcEventNames.ON_IS_LOGGED_IN,
             () => this._authenticatorService.isLoggedIn());
     }
 
@@ -104,6 +110,7 @@ export class IpcMainEvents {
 
         return this._handleAsyncOperation(
             event,
+            IpcEventNames.ON_LOGIN,
             () => this._authenticatorService.login());
     }
 
@@ -114,6 +121,7 @@ export class IpcMainEvents {
 
         return this._handleNonAsyncOperation(
             event,
+            IpcEventNames.ON_LOGIN_REACTIVATE,
             () => this._window?.show());
     }
 
@@ -124,6 +132,7 @@ export class IpcMainEvents {
 
         return this._handleNonAsyncOperation(
             event,
+            IpcEventNames.ON_LOGOUT,
             () => this._authenticatorService.logout());
     }
 
@@ -134,6 +143,7 @@ export class IpcMainEvents {
 
         return this._handleAsyncOperation(
             event,
+            IpcEventNames.ON_TOKEN_REFRESH,
             () => this._authenticatorService.refreshAccessToken());
     }
 
@@ -144,6 +154,7 @@ export class IpcMainEvents {
 
         return this._handleNonAsyncOperation(
             event,
+            IpcEventNames.ON_EXPIRE_ACCESS_TOKEN,
             () => this._authenticatorService.expireAccessToken());
     }
 
@@ -154,6 +165,7 @@ export class IpcMainEvents {
 
         return this._handleNonAsyncOperation(
             event,
+            IpcEventNames.ON_EXPIRE_REFRESH_TOKEN,
             () => this._authenticatorService.expireRefreshToken());
     }
 
@@ -161,7 +173,10 @@ export class IpcMainEvents {
      * Run an async operation and return data and error values so that the frontend gets error objects
      * Also make common security checks to ensure that the sender is the application
      */
-    private async _handleAsyncOperation(event: IpcMainInvokeEvent, action: () => Promise<any>): Promise<[any, string]> {
+    private async _handleAsyncOperation(
+        event: IpcMainInvokeEvent,
+        name: string,
+        action: () => Promise<any>): Promise<[any, string]> {
 
         try {
 
@@ -174,8 +189,9 @@ export class IpcMainEvents {
 
         } catch (e: any) {
 
-            const errorJson = ErrorFactory.fromException(e).toJson();
-            return [null, errorJson];
+            const error = ErrorFactory.fromException(e);
+            this._logError(name, error);
+            return [null, error.toJson()];
         }
     }
 
@@ -183,7 +199,10 @@ export class IpcMainEvents {
      * Run a non-async operation and return data and error values so that the frontend gets error objects
      * Also make common security checks to ensure that the sender is the application
      */
-    private async _handleNonAsyncOperation(event: IpcMainInvokeEvent, action: () => any): Promise<[any, string]> {
+    private async _handleNonAsyncOperation(
+        event: IpcMainInvokeEvent,
+        name: string,
+        action: () => any): Promise<[any, string]> {
 
         try {
             if (!event.senderFrame.url.startsWith('file:/')) {
@@ -195,9 +214,25 @@ export class IpcMainEvents {
 
         } catch (e: any) {
 
-            const errorJson = ErrorFactory.fromException(e).toJson();
-            return [null, errorJson];
+            const error = ErrorFactory.fromException(e);
+            this._logError(name, error);
+            return [null, error.toJson()];
         }
+    }
+
+    /*
+     * Output some basic details to the console
+     */
+    private async _logError(name: string, error: UIError) {
+
+        let info = `Main ${name} error`;
+        if (error.statusCode) {
+            info += `, status: ${error.statusCode}`;
+        }
+
+        info += `, code: ${error.errorCode}`;
+        info += `, message: ${error.message}`;
+        console.log(info);
     }
 
     /*

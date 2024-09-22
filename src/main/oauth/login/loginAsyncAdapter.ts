@@ -3,9 +3,9 @@ import {
     AuthorizationNotifier,
     AuthorizationRequest,
     AuthorizationResponse,
-    AuthorizationServiceConfiguration,
-    DefaultCrypto} from '@openid/appauth';
+    AuthorizationServiceConfiguration} from '@openid/appauth';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
+import {NodeCrypto} from '../../utilities/nodeCrypto';
 import {BrowserLoginRequestHandler} from './browserLoginRequestHandler';
 import {LoginRedirectResult} from './loginRedirectResult';
 import {LoginState} from './loginState';
@@ -42,7 +42,7 @@ export class LoginAsyncAdapter {
             redirect_uri: redirectUri,
             scope: this._configuration.scope,
         };
-        const authorizationRequest = new AuthorizationRequest(requestJson, new DefaultCrypto(), true);
+        const authorizationRequest = new AuthorizationRequest(requestJson, new NodeCrypto(), true);
 
         // Set up PKCE for the redirect, which avoids native app vulnerabilities
         await authorizationRequest.setupCodeVerifier();

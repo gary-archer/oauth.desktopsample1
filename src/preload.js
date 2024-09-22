@@ -7,19 +7,9 @@ const {contextBridge, ipcRenderer} = require('electron');
 contextBridge.exposeInMainWorld('api', {
 
     /*
-     * Send a request from the renderer to the main process and return the response
+     * Send a request from the renderer to the main process and receive a response
      */
     sendMessage: async function(name, requestData) {
         return await ipcRenderer.invoke(name, requestData);
-    },
-
-    /*
-     * Receive a notification from the main process
-     */
-    receiveMessage: function(name, callback) {
-
-        ipcRenderer.on(name, (event, responseData) => {
-            callback(responseData);
-        });
     },
 });
