@@ -211,6 +211,7 @@ export class IpcMainEvents {
         this._onGetApiUserInfo = this._onGetApiUserInfo.bind(this);
         this._onIsLoggedIn = this._onIsLoggedIn.bind(this);
         this._onLogin = this._onLogin.bind(this);
+        this._onLoginReactivate = this._onLoginReactivate.bind(this);
         this._onLogout = this._onLogout.bind(this);
         this._onTokenRefresh = this._onTokenRefresh.bind(this);
         this._onExpireAccessToken = this._onExpireAccessToken.bind(this);

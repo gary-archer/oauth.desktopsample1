@@ -10,6 +10,7 @@ export class IpcRendererEvents {
 
     public constructor(window: Window) {
         this._api = (window as any).api;
+        this._setupCallbacks();
     }
 
     /*
@@ -100,5 +101,13 @@ export class IpcRendererEvents {
         }
 
         return data;
+    }
+
+    /*
+     * Make the this parameter available in async callbacks
+     */
+    private _setupCallbacks(): void {
+        this.getCompanyList = this.getCompanyList.bind(this);
+        this.reactivate = this.reactivate.bind(this);
     }
 }

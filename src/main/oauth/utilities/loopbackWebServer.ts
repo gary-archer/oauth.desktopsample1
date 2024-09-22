@@ -1,5 +1,5 @@
 
-import getPort from 'get-port';
+import getPort, {portNumbers} from 'get-port';
 import Http from 'http';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {LoginState} from '../login/loginState';
@@ -42,7 +42,7 @@ export class LoopbackWebServer {
 
         // Get a port to listen on
         const options = {
-            port: 3000,
+            port: portNumbers(this._configuration.loopbackMinPort, this._configuration.loopbackMaxPort),
             host: this._configuration.loopbackHostname,
         };
         LoopbackWebServer._runtimePort = await getPort(options);
@@ -66,7 +66,7 @@ export class LoopbackWebServer {
         }
 
         const args = new URLSearchParams(url.search);
-        if (args.get('state')) {
+        if (!args.get('state')) {
             response.end();
             return;
         }
