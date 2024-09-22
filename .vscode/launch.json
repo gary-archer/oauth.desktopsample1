@@ -1,6 +1,4 @@
 {
-    // See the below guide for debug settings
-    // https://github.com/microsoft/vscode-recipes/tree/master/Electron
     "version": "0.2.0",
     "configurations": [
         {
@@ -10,10 +8,10 @@
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
             "runtimeArgs": [
                 "--remote-debugging-port=9223",
-                "."
+                "./dist"
             ],
             "windows": {
-				"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
 			}
         },
         {
@@ -21,11 +19,13 @@
             "request": "attach",
             "name": "Renderer Process",
             "port": 9223,
-            "webRoot": "${workspaceFolder}",
-            "timeout": 30000
+            "webRoot": "${workspaceRoot}/src/*",
+            "sourceMaps": true,
+            "sourceMapPathOverrides":{
+                "webpack:///./*": "${workspaceRoot}/dist/*"
+            }
         }
     ],
-    // Run the compound statement to attach to debug both sides of the app at once
     "compounds": [
         {
             "name": "Debug All",
