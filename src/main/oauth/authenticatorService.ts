@@ -22,8 +22,8 @@ export interface AuthenticatorService {
     logout(): void;
 
     // Update the access token to make it act like it is expired
-    expireAccessToken(): Promise<void>;
+    expireAccessToken(): void;
 
     // Update the refresh token to make it act like it is expired
-    expireRefreshToken(): Promise<void>;
+    expireRefreshToken(): void;
 }

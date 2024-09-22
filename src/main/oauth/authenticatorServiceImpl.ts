@@ -112,7 +112,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
      * This method is for testing only, to make the access token fail and act like it has expired
      * The corrupted access token will be sent to the API but rejected when introspected
      */
-    public async expireAccessToken(): Promise<void> {
+    public expireAccessToken(): void {
 
         if (this._tokens && this._tokens.accessToken) {
             this._tokens.accessToken = `${this._tokens.accessToken}x`;
@@ -123,7 +123,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
      * This method is for testing only, to make the refresh token fail and act like it has expired
      * The corrupted refresh token will be sent to the authorization server but rejected
      */
-    public async expireRefreshToken(): Promise<void> {
+    public expireRefreshToken(): void {
 
         if (this._tokens && this._tokens.refreshToken) {
             this._tokens.refreshToken = `${this._tokens.refreshToken}x`;
