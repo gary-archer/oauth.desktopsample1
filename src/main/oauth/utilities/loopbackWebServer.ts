@@ -59,35 +59,38 @@ export class LoopbackWebServer {
      */
     private _handleBrowserRequest(request: Http.IncomingMessage, response: Http.ServerResponse): void {
 
-        if (!request.url) {
+        const url = this._tryParseUrl(request);
+        if (!url) {
+            response.end();
             return;
         }
 
-        const url = this._tryParseUrl(request);
-        if (url) {
-
-            // Ask the state object to handle the response based on the state parameter returned
-            const args = new URLSearchParams(url.search);
-            this._loginState.handleLoginResponse(args);
-
-            // Calculate the post login location, and forward errors if required
-            let postLoginUrl = this._configuration.postLoginPage;
-            const error = args.get('error');
-            if (error) {
-                postLoginUrl += `?error=${error}`;
-            }
-
-            // Redirect to the post login location
-            response.writeHead(301, {
-                Location: postLoginUrl,
-            });
+        const args = new URLSearchParams(url.search);
+        if (args.get('state')) {
             response.end();
-
-            // Stop the web server now that the login attempt has finished
-            LoopbackWebServer._server?.close();
-            LoopbackWebServer._server = null;
-            LoopbackWebServer._runtimePort = 0;
+            return;
         }
+
+        // Ask the state object to handle the response based on the state parameter returned
+        this._loginState.handleLoginResponse(args);
+
+        // Calculate the post login location, and forward errors if required
+        let postLoginUrl = this._configuration.postLoginPage;
+        const error = args.get('error');
+        if (error) {
+            postLoginUrl += `?error=${error}`;
+        }
+
+        // Redirect to the post login location
+        response.writeHead(301, {
+            Location: postLoginUrl,
+        });
+        response.end();
+
+        // Stop the web server now that the login attempt has finished
+        LoopbackWebServer._server?.close();
+        LoopbackWebServer._server = null;
+        LoopbackWebServer._runtimePort = 0;
     }
 
     /*

@@ -50,7 +50,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get companies
      */
-    private async _onGetCompanyList(event: IpcMainInvokeEvent, args: any): Promise<[any, string]> {
+    private async _onGetCompanyList(event: IpcMainInvokeEvent): Promise<[any, string]> {
 
         return this._handleAsyncOperation(
             event,
@@ -70,7 +70,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get OAuth user info
      */
-    private async _onGetOAuthUserInfo(event: IpcMainInvokeEvent, args: any): Promise<[any, string]> {
+    private async _onGetOAuthUserInfo(event: IpcMainInvokeEvent): Promise<[any, string]> {
 
         return this._handleAsyncOperation(
             event,

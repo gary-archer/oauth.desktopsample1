@@ -11,6 +11,7 @@ import {TitleView} from '../views/titleView';
 /*
  * The Electron render process starts with the application class
  */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 export class App {
 
     private _ipcEvents: IpcRendererEvents | null;
@@ -70,14 +71,14 @@ export class App {
             await this._loadMainView();
 
             // Get user info from the API unless we are in the login required view
-            if (!this._router!.isInLoginRequiredView()) {
+            if (!this._router?.isInLoginRequiredView()) {
                 await this._loadUserInfo();
             }
 
         } catch (e: any) {
 
             // Render the error view if there are problems
-            this._errorView!.report(e);
+            this._errorView.report(e);
         }
     }
 
@@ -110,9 +111,9 @@ export class App {
         this._headerButtonsView.disableSessionButtons();
 
         // Load the view
-        await this._router!.loadView();
+        await this._router?.loadView();
 
-        if (this._router!.isInLoginRequiredView()) {
+        if (this._router?.isInLoginRequiredView()) {
 
             // If we are logged out then clear user info
             this._headerButtonsView.setIsAuthenticated(false);

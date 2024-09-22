@@ -9,10 +9,9 @@ export class ConfigurationLoader {
     /*
      * We download user info from the API so that we can get any data we need
      */
-    public static load(fileName: string): Configuration {
+    public static load(configFilePath: string): Configuration {
 
-        const filePath = `${__dirname}/../../${fileName}`;
-        const configurationBuffer = fs.readFileSync(filePath);
+        const configurationBuffer = fs.readFileSync(configFilePath);
         return JSON.parse(configurationBuffer.toString()) as Configuration;
     }
 }

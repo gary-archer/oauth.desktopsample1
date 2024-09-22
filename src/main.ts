@@ -115,7 +115,7 @@ class Main {
             policy += " frame-ancestors 'none';";
             policy += " base-uri 'self';";
             policy += " form-action 'self'";
-        
+
             callback({
                 responseHeaders: {
                     ...details.responseHeaders,
