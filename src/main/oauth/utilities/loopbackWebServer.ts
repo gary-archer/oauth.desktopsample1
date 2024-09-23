@@ -51,7 +51,7 @@ export class LoopbackWebServer {
         LoopbackWebServer._server = Http.createServer(this._handleBrowserRequest);
 
         // Start listening for requests
-        LoopbackWebServer._server.listen(LoopbackWebServer._runtimePort);
+        LoopbackWebServer._server.listen(LoopbackWebServer._runtimePort, this._configuration.loopbackHostname);
     }
 
     /*
