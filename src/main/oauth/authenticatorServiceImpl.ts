@@ -153,7 +153,9 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             // Get a port to listen on and then start the loopback web server
             const server = new LoopbackWebServer(this._configuration, this._loginState);
             const runtimePort = await server.start();
-            const redirectUri = `http://${this._configuration.loopbackHostname}:${runtimePort}`;
+            const host = this._configuration.loopbackHostname;
+            const redirectUri = `http://${host}:${runtimePort}${this._configuration.redirectPath}`;
+            console.log('Using: ' + redirectUri);
 
             // Download metadata from the authorization server if required
             await this._loadMetadata();

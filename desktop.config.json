@@ -7,10 +7,11 @@
     "oauth": {
         "authority":        "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_CuhLeqiE9",
         "clientId":         "6o4rlsod8j6phsnuf3pdjo640u",
+        "redirectPath":     "",
+        "scope":            "openid profile https://api.authsamples.com/investments",
         "loopbackHostname": "localhost",
         "loopbackMinPort":  8001,
         "loopbackMaxPort":  8003,
-        "scope":            "openid profile https://api.authsamples.com/investments",
         "postLoginPage":    "https://www.authsamples.com/apps/basicdesktopapp/postlogin.html"
     }
 }

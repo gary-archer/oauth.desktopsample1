@@ -1,5 +1,5 @@
 
-import getPort, {portNumbers} from 'get-port';
+import getPort, {clearLockedPorts, portNumbers} from 'get-port';
 import Http from 'http';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {LoginState} from '../login/loginState';
@@ -51,7 +51,7 @@ export class LoopbackWebServer {
         LoopbackWebServer._server = Http.createServer(this._handleBrowserRequest);
 
         // Start listening for requests
-        LoopbackWebServer._server.listen(LoopbackWebServer._runtimePort);
+        LoopbackWebServer._server.listen(LoopbackWebServer._runtimePort, this._configuration.loopbackMaxPort);
     }
 
     /*
@@ -88,6 +88,7 @@ export class LoopbackWebServer {
         response.end();
 
         // Stop the web server now that the login attempt has finished
+        clearLockedPorts();
         LoopbackWebServer._server?.close();
         LoopbackWebServer._server = null;
         LoopbackWebServer._runtimePort = 0;

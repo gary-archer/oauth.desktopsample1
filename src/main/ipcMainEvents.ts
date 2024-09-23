@@ -51,7 +51,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get companies
      */
-    private async _onGetCompanyList(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onGetCompanyList(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleAsyncOperation(
             event,
@@ -62,7 +62,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get transactions
      */
-    private async _onGetCompanyTransactions(event: IpcMainInvokeEvent, args: any): Promise<[any, string]> {
+    private async _onGetCompanyTransactions(event: IpcMainInvokeEvent, args: any): Promise<any> {
 
         return this._handleAsyncOperation(
             event,
@@ -73,7 +73,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get OAuth user info
      */
-    private async _onGetOAuthUserInfo(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onGetOAuthUserInfo(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleAsyncOperation(
             event,
@@ -84,7 +84,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get API user info
      */
-    private async _onGetApiUserInfo(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onGetApiUserInfo(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleAsyncOperation(
             event,
@@ -95,7 +95,7 @@ export class IpcMainEvents {
     /*
      * See if there are any tokens
      */
-    private async _onIsLoggedIn(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onIsLoggedIn(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -106,7 +106,7 @@ export class IpcMainEvents {
     /*
      * Run a login redirect on the system browser
      */
-    private async _onLogin(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onLogin(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleAsyncOperation(
             event,
@@ -117,7 +117,7 @@ export class IpcMainEvents {
     /*
      * Bring the window back to the foreground when a login completes
      */
-    private async _onLoginReactivate(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onLoginReactivate(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -128,7 +128,7 @@ export class IpcMainEvents {
     /*
      * Run a logout redirect on the system browser
      */
-    private async _onLogout(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onLogout(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -139,7 +139,7 @@ export class IpcMainEvents {
     /*
      * Perform token refresh
      */
-    private async _onTokenRefresh(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onTokenRefresh(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleAsyncOperation(
             event,
@@ -150,7 +150,7 @@ export class IpcMainEvents {
     /*
      * For testing, make the access token act expired
      */
-    private async _onExpireAccessToken(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onExpireAccessToken(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -161,7 +161,7 @@ export class IpcMainEvents {
     /*
      * For testing, make the refresh token act expired
      */
-    private async _onExpireRefreshToken(event: IpcMainInvokeEvent): Promise<[any, string]> {
+    private async _onExpireRefreshToken(event: IpcMainInvokeEvent): Promise<any> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -176,7 +176,7 @@ export class IpcMainEvents {
     private async _handleAsyncOperation(
         event: IpcMainInvokeEvent,
         name: string,
-        action: () => Promise<any>): Promise<[any, string]> {
+        action: () => Promise<any>): Promise<any> {
 
         try {
 
@@ -185,13 +185,19 @@ export class IpcMainEvents {
             }
 
             const data = await action();
-            return [data, ''];
+            return {
+                data,
+                error: ''
+            };
 
         } catch (e: any) {
 
             const error = ErrorFactory.fromException(e);
             this._logError(name, error);
-            return [null, error.toJson()];
+            return {
+                data: null,
+                error: error.toJson()
+            };
         }
     }
 
@@ -202,7 +208,7 @@ export class IpcMainEvents {
     private async _handleNonAsyncOperation(
         event: IpcMainInvokeEvent,
         name: string,
-        action: () => any): Promise<[any, string]> {
+        action: () => any): Promise<any> {
 
         try {
             if (!event.senderFrame.url.startsWith('file:/')) {
@@ -210,13 +216,19 @@ export class IpcMainEvents {
             }
 
             const data = action();
-            return [data, ''];
+            return {
+                data,
+                error: ''
+            };
 
         } catch (e: any) {
 
             const error = ErrorFactory.fromException(e);
             this._logError(name, error);
-            return [null, error.toJson()];
+            return {
+                data: null,
+                error: error.toJson()
+            };
         }
     }
 

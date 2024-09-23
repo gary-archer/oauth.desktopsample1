@@ -4,9 +4,10 @@
 export interface OAuthConfiguration {
     authority: string;
     clientId: string;
+    redirectPath: string;
+    scope: string;
     loopbackHostname: string;
     loopbackMinPort: number;
     loopbackMaxPort: number;
-    scope: string;
     postLoginPage: string;
 }
