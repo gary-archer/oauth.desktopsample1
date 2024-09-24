@@ -155,7 +155,6 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             const runtimePort = await server.start();
             const host = this._configuration.loopbackHostname;
             const redirectUri = `http://${host}:${runtimePort}${this._configuration.redirectPath}`;
-            console.log('Using: ' + redirectUri);
 
             // Download metadata from the authorization server if required
             await this._loadMetadata();
