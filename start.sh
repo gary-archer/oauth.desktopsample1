@@ -71,6 +71,14 @@ if [ $? -ne 0 ]; then
 fi
 
 #
+# On Linux, work around this Electron issue:
+# - https://github.com/electron/electron/issues/42510
+#  
+if [ "$PLATFORM" == 'LINUX' ]; then
+  sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+fi
+
+#
 # Run differently depending on the platform
 #
 npx electron ./dist
