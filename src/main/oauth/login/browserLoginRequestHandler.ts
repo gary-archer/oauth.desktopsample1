@@ -16,7 +16,7 @@ import {LoginState} from './loginState';
 export class BrowserLoginRequestHandler extends AuthorizationRequestHandler {
 
     private readonly _state: LoginState;
-    private _authorizationPromise: Promise<AuthorizationRequestResponse> | null;
+    private _response: AuthorizationRequestResponse | null;
 
     /*
      * Set up the base class
@@ -25,46 +25,37 @@ export class BrowserLoginRequestHandler extends AuthorizationRequestHandler {
 
         super(new BasicQueryStringUtils(), new NodeCrypto());
         this._state = state;
-        this._authorizationPromise = null;
+        this._response = null;
     }
 
     /*
      * Use the AppAuth class to form the OAuth URL, then make the login request on the system browser
      */
-    public performAuthorizationRequest(
+    public async performAuthorizationRequest(
         metadata: AuthorizationServiceConfiguration,
-        request: AuthorizationRequest): void {
+        request: AuthorizationRequest): Promise<void> {
 
-        // Create a promise to handle the response from the browser
-        this._authorizationPromise = new Promise<AuthorizationRequestResponse>((resolve) => {
+        // Create a callback to handle the response when a deep link is received
+        const callback = async (args: URLSearchParams | null) => {
 
-            // Create a callback to wait for completion
-            const callback = (args: URLSearchParams) => {
-
-                // Package up data into an object and then resolve our promise
-                const response = this._handleBrowserLoginResponse(args, request);
-                resolve(response);
-
-                // Ask the base class to call our completeAuthorizationRequest
+            if (args) {
+                this._response = this._handleBrowserLoginResponse(args, request);
                 super.completeAuthorizationRequestIfPossible();
-            };
+            }
+        };
 
-            // Store login state so that we can receive the response
-            this._state.storeLoginCallback(request.state, callback);
-        });
+        // Store the callback mapped to the OAuth state parameter
+        this._state.storeLoginCallback(request.state, callback);
 
-        // Form the OAuth request
-        const loginUrl = this.buildRequestUrl(metadata, request);
-
-        // Invoke the browser
-        open(loginUrl);
+        // Form the authorization request using the AppAuth base class and open the system browser there
+        await open(this.buildRequestUrl(metadata, request));
     }
 
     /*
      * Return data back to the authenticator's notifier
      */
     protected async completeAuthorizationRequest(): Promise<AuthorizationRequestResponse | null> {
-        return this._authorizationPromise;
+        return this._response;
     }
 
     /*

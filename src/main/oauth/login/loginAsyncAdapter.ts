@@ -49,31 +49,28 @@ export class LoginAsyncAdapter {
         } as AuthorizationRequestJson;
         const authorizationRequest = new AuthorizationRequest(requestJson, new NodeCrypto(), true);
 
-        // Set up PKCE for the redirect, which avoids native app vulnerabilities
+        // Set up PKCE for the redirect
         await authorizationRequest.setupCodeVerifier();
 
-        // Wrap the AppAuth-JS callbacks in a promise
-        return new Promise((resolve, reject) => {
+        // Wrap the AppAuth notifier in a promise
+        const notifier = new AuthorizationNotifier();
+        const promise = new Promise<LoginRedirectResult>((resolve) => {
 
-            // Use the AppAuth mechanism of a notifier to receive the login result
-            const notifier = new AuthorizationNotifier();
             notifier.setAuthorizationListener(async (
                 request: AuthorizationRequest,
                 response: AuthorizationResponse | null,
                 error: AuthorizationError | null) => {
 
-                try {
-                    resolve({request, response, error});
-
-                } catch (e: any) {
-                    reject(e);
-                }
+                resolve({request, response, error});
             });
-
-            // Start the login redirect on a custom browser handler
-            const browserLoginRequestHandler = new BrowserLoginRequestHandler(this._state);
-            browserLoginRequestHandler.setAuthorizationNotifier(notifier);
-            browserLoginRequestHandler.performAuthorizationRequest(this._metadata, authorizationRequest);
         });
+
+        // Spin up the browser and begin the login
+        const browserLoginRequestHandler = new BrowserLoginRequestHandler(this._state);
+        browserLoginRequestHandler.setAuthorizationNotifier(notifier);
+        await browserLoginRequestHandler.performAuthorizationRequest(this._metadata, authorizationRequest);
+
+        // Wait for the result
+        return await promise;
     }
 }
