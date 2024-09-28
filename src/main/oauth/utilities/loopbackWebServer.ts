@@ -1,8 +1,8 @@
 
 import getPort, {clearLockedPorts, portNumbers} from 'get-port';
 import Http from 'http';
+import {EventEmitter} from 'node:events';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
-import {LoginState} from '../login/loginState';
 
 /*
  * Manage the local web server which listens on a loopback URL on the desktop user's PC
@@ -15,11 +15,11 @@ export class LoopbackWebServer {
 
     // Instance fields
     private readonly _configuration: OAuthConfiguration;
-    private readonly _loginState: LoginState;
+    private readonly _eventEmitter: EventEmitter;
 
-    public constructor(oauthConfig: OAuthConfiguration, loginState: LoginState) {
+    public constructor(oauthConfig: OAuthConfiguration, eventEmitter: EventEmitter) {
         this._configuration = oauthConfig;
-        this._loginState = loginState;
+        this._eventEmitter = eventEmitter;
         this._setupCallbacks();
     }
 
@@ -71,19 +71,12 @@ export class LoopbackWebServer {
             return;
         }
 
-        // Ask the state object to handle the response based on the state parameter returned
-        this._loginState.handleLoginResponse(args);
-
-        // Calculate the post login location, and forward errors if required
-        let postLoginUrl = this._configuration.postLoginPage;
-        const error = args.get('error');
-        if (error) {
-            postLoginUrl += `?error=${error}`;
-        }
+        // Notify the request handler to return the response
+        this._eventEmitter.emit('LOGIN_COMPLETE', args);
 
         // Redirect to the post login location
         response.writeHead(301, {
-            Location: postLoginUrl,
+            Location: this._configuration.postLoginPage,
         });
         response.end();
 

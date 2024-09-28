@@ -95,7 +95,7 @@ export class IpcMainEvents {
     /*
      * See if there are any tokens
      */
-    private async _onIsLoggedIn(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onIsLoggedIn(event: IpcMainInvokeEvent): Promise<boolean> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -106,7 +106,7 @@ export class IpcMainEvents {
     /*
      * Run a login redirect on the system browser
      */
-    private async _onLogin(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onLogin(event: IpcMainInvokeEvent): Promise<void> {
 
         return this._handleAsyncOperation(
             event,

@@ -50,6 +50,10 @@ export class ErrorView {
             // Login required errors are not real exceptions, and we will instead move to the login required page
             LoginNavigation.navigateToLoginRequired();
 
+        } else if (error.errorCode === ErrorCodes.loginCancelled) {
+
+            // The frontend ignores this error code and maintains its current state
+
         } else {
 
             // Otherwise render the error details

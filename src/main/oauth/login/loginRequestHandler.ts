@@ -1,16 +1,16 @@
 import {
     AuthorizationError,
-    AuthorizationNotifier,
     AuthorizationRequest,
     AuthorizationRequestHandler,
     AuthorizationRequestResponse,
     AuthorizationResponse,
     AuthorizationServiceConfiguration,
     BasicQueryStringUtils} from '@openid/appauth';
+import EventEmitter from 'node:events';
 import open from 'open';
+import {ErrorFactory} from '../../../shared/errors/errorFactory';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {NodeCrypto} from '../../utilities/nodeCrypto';
-import {LoginRedirectResult} from './loginRedirectResult';
 import {LoginState} from './loginState';
 
 /*
@@ -21,27 +21,28 @@ export class LoginRequestHandler extends AuthorizationRequestHandler {
     private readonly _configuration: OAuthConfiguration;
     private readonly _metadata: AuthorizationServiceConfiguration;
     private readonly _state: LoginState;
-    private _response: AuthorizationRequestResponse | null;
+    private readonly _eventEmitter: EventEmitter;
 
     public constructor(
         configuration: OAuthConfiguration,
         metadata: AuthorizationServiceConfiguration,
-        state: LoginState) {
+        state: LoginState,
+        eventEmitter: EventEmitter) {
 
         super(new BasicQueryStringUtils(), new NodeCrypto());
+
         this._configuration = configuration;
         this._metadata = metadata;
         this._state = state;
-        this._response = null;
+        this._eventEmitter = eventEmitter;
     }
 
     /*
      * Run the login redirect and listen for the response
      */
-    public async execute(redirectUri: string): Promise<LoginRedirectResult> {
+    public async execute(redirectUri: string): Promise<AuthorizationRequestResponse> {
 
-        // Create the authorization request message and use prompt=login to force a new login
-        // Note however that AWS Cognito does not support that parameter
+        // Set request parameters and use prompt=login to force a new login
         const requestJson = {
             response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
             client_id: this._configuration.clientId,
@@ -51,60 +52,52 @@ export class LoginRequestHandler extends AuthorizationRequestHandler {
                 'prompt': 'login',
             },
         };
-        const authorizationRequest = new AuthorizationRequest(requestJson, new NodeCrypto(), true);
 
-        // Set up PKCE for the redirect
+        // Create the request
+        const authorizationRequest = new AuthorizationRequest(requestJson, new NodeCrypto(), true);
         await authorizationRequest.setupCodeVerifier();
 
-        // Wrap the AppAuth notifier in a promise
-        const notifier = new AuthorizationNotifier();
-        const promise = new Promise<LoginRedirectResult>((resolve) => {
+        // Wait for a response from the loopback web server
+        const promise = new Promise<AuthorizationRequestResponse>((resolve, reject) => {
 
-            notifier.setAuthorizationListener(async (
-                request: AuthorizationRequest,
-                response: AuthorizationResponse | null,
-                error: AuthorizationError | null) => {
+            // Store the request data and use it later to handle re-entrancy
+            this._state.storeRequest(authorizationRequest);
 
-                resolve({request, response, error});
+            // When we get a response, make sure we use the matching request to complete the flow
+            this._eventEmitter.once('LOGIN_COMPLETE', (args: URLSearchParams) => {
+
+                const state = args.get('state') || '';
+                const foundRequest = this._state.getRequestForState(state);
+                if (!foundRequest) {
+                    reject(ErrorFactory.fromLoginCancelled());
+                    return;
+                }
+
+                this._state.clear();
+                resolve(this._handleBrowserLoginResponse(args, foundRequest));
             });
         });
 
-        // Spin up the browser and begin the login
-        this.setAuthorizationNotifier(notifier);
+        // Send an authorization request on the browser, which gets redirected to the loopback web server
         await this.performAuthorizationRequest(this._metadata, authorizationRequest);
-
-        // Wait for the result
         return await promise;
     }
 
     /*
-     * Use the AppAuth class to form the OAuth URL, then make the login request on the system browser
+     * Use this required AppAuth method to spin up the system browser
      */
     public async performAuthorizationRequest(
         metadata: AuthorizationServiceConfiguration,
         request: AuthorizationRequest): Promise<void> {
 
-        // Create a callback to handle the response when a deep link is received
-        const callback = async (args: URLSearchParams | null) => {
-
-            if (args) {
-                this._response = this._handleBrowserLoginResponse(args, request);
-                super.completeAuthorizationRequestIfPossible();
-            }
-        };
-
-        // Store the callback mapped to the OAuth state parameter
-        this._state.storeLoginCallback(request.state, callback);
-
-        // Form the authorization request using the AppAuth base class and open the system browser there
         await open(this.buildRequestUrl(metadata, request));
     }
 
     /*
-     * Return data back to the authenticator's notifier
+     * Provide a null implementation since we do our own completion
      */
     protected async completeAuthorizationRequest(): Promise<AuthorizationRequestResponse | null> {
-        return this._response;
+        return null;
     }
 
     /*

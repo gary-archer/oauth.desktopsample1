@@ -51,6 +51,17 @@ export class ErrorFactory {
     }
 
     /*
+     * A login required error is thrown to short circuit execution when the UI cannot get an access token
+     */
+    public static fromLoginCancelled(): UIError {
+
+        return new UIError(
+            'Login',
+            ErrorCodes.loginCancelled,
+            'The login was cancelled');
+    }
+
+    /*
      * Handle errors signing in
      */
     public static fromLoginOperation(exception: any, errorCode: string): UIError {

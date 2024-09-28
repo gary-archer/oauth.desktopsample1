@@ -1,63 +1,48 @@
-import {LoginResponseCallback} from './loginResponseCallback';
+import {AuthorizationRequest} from '@openid/appauth';
 
 /*
- * A class to manage login state when interacting with the system browser, including re-entrancy
+ * Store data to enable cleanup of all login resources once a login succeeds
  */
 export class LoginState {
 
-    private _callbackMap: [string, LoginResponseCallback][];
+    private _requests: AuthorizationRequest[];
 
     public constructor() {
-        this._callbackMap = [];
+        this._requests = [];
         this._setupCallbacks();
     }
 
     /*
-     * Store the login callback so that we can resume once we receive a notification from the system browser
+     * Store the request so that we can validate the response state
      */
-    public storeLoginCallback(state: string, responseCallback: LoginResponseCallback): void {
-        this._callbackMap.push([state, responseCallback]);
-    }
-
-    /*
-     * Receive authorization response data and resume the login flow
-     */
-    public handleLoginResponse(args: URLSearchParams): void {
-
-        const state = args.get('state');
-        if (state) {
-            const callback = this._getCallbackForState(state);
-            if (callback) {
-                callback(args);
-                this._clearState(state);
-            }
-        }
+    public storeRequest(request: AuthorizationRequest): void {
+        this._requests.push(request);
     }
 
     /*
      * Look up a callback from the state parameter
      */
-    private _getCallbackForState(state: string): LoginResponseCallback | null {
+    public getRequestForState(state: string): AuthorizationRequest | null {
 
-        const stateCallbackPair = this._callbackMap.find((pair) => pair[0] === state);
-        if (stateCallbackPair) {
-            return stateCallbackPair[1];
+        const found = this._requests.find((r) => r.state === state);
+        if (found) {
+            return found;
         }
 
         return null;
     }
 
     /*
-     * Once complete, clear state and its callback from the collection
+     * Clear all data once a login completes
      */
-    private _clearState(state: string) {
-        this._callbackMap = this._callbackMap.filter((pair) => pair[0] !== state);
+    public clear(): void {
+        this._requests = [];
     }
 
     /*
      * Ensure that the this parameter is available in async callbacks
      */
     private _setupCallbacks() {
-        this.handleLoginResponse = this.handleLoginResponse.bind(this);
+        this.getRequestForState = this.getRequestForState.bind(this);
     }
 }
