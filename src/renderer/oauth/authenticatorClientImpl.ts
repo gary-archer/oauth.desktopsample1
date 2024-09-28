@@ -24,7 +24,7 @@ export class AuthenticatorClientImpl implements AuthenticatorClient {
      * Forward to the main side of the app to perform the login work
      */
     public async login(): Promise<void> {
-        await this._ipcEvents.login();
+        return await this._ipcEvents.login();
     }
 
     /*

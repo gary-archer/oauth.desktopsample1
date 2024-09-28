@@ -1,3 +1,7 @@
+import {ApiUserInfo} from '../shared/api/apiUserInfo';
+import {Company} from '../shared/api/company';
+import {CompanyTransactions} from '../shared/api/companyTransactions';
+import {OAuthUserInfo} from '../shared/api/oauthUserInfo';
 import {UIError} from '../shared/errors/uiError';
 import {IpcEventNames} from '../shared/ipcEventNames';
 
@@ -16,35 +20,35 @@ export class IpcRendererEvents {
     /*
      * Make an API request to get companies
      */
-    public async getCompanyList() : Promise<any> {
+    public async getCompanyList() : Promise<Company[]> {
         return await this._sendMessage(IpcEventNames.ON_GET_COMPANIES, {});
     }
 
     /*
      * Make an API request to get company transactions
      */
-    public async getCompanyTransactions(id: string) : Promise<any> {
+    public async getCompanyTransactions(id: string) : Promise<CompanyTransactions> {
         return await this._sendMessage(IpcEventNames.ON_GET_TRANSACTIONS, {id});
     }
 
     /*
      * Make an API request to get OAuth user info
      */
-    public async getOAuthUserInfo() : Promise<any> {
+    public async getOAuthUserInfo() : Promise<OAuthUserInfo> {
         return await this._sendMessage(IpcEventNames.ON_GET_OAUTH_USER_INFO, {});
     }
 
     /*
      * Make an API request to get API user info
      */
-    public async getApiUserInfo() : Promise<any> {
+    public async getApiUserInfo() : Promise<ApiUserInfo> {
         return await this._sendMessage(IpcEventNames.ON_GET_API_USER_INFO, {});
     }
 
     /*
      * Ask the main side of the app if it is logged in
      */
-    public async isLoggedIn() : Promise<any> {
+    public async isLoggedIn() : Promise<boolean> {
         return await this._sendMessage(IpcEventNames.ON_IS_LOGGED_IN, {});
     }
 
@@ -52,7 +56,7 @@ export class IpcRendererEvents {
      * Run a login on the main side of the app
      */
     public async login(): Promise<void> {
-        await this._sendMessage(IpcEventNames.ON_LOGIN, {});
+        return await this._sendMessage(IpcEventNames.ON_LOGIN, {});
     }
 
     /*

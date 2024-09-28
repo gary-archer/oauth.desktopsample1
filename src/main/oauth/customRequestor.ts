@@ -1,8 +1,8 @@
 import axios, {AxiosRequestConfig, Method} from 'axios';
 import {Requestor} from '@openid/appauth';
-import {ErrorFactory} from '../../../shared/errors/errorFactory';
-import {AxiosUtils} from '../../utilities/axiosUtils';
-import {HttpProxy} from '../../utilities/httpProxy';
+import {ErrorFactory} from '../../shared/errors/errorFactory';
+import {AxiosUtils} from '../utilities/axiosUtils';
+import {HttpProxy} from '../utilities/httpProxy';
 
 /*
  * Override the requestor object of AppAuthJS, so that OAuth error codes are returned
