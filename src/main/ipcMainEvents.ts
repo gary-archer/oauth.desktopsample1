@@ -7,6 +7,10 @@ import {Configuration} from './configuration/configuration';
 import {AuthenticatorService} from './oauth/authenticatorService';
 import {AuthenticatorServiceImpl} from './oauth/authenticatorServiceImpl';
 import {HttpProxy} from './utilities/httpProxy';
+import { Company } from '../shared/api/company';
+import { CompanyTransactions } from '../shared/api/companyTransactions';
+import { OAuthUserInfo } from '../shared/api/oauthUserInfo';
+import { ApiUserInfo } from '../shared/api/apiUserInfo';
 
 /*
  * A class that deals with IPC events of the main side of the app
@@ -51,7 +55,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get companies
      */
-    private async _onGetCompanyList(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onGetCompanyList(event: IpcMainInvokeEvent): Promise<Company[]> {
 
         return this._handleAsyncOperation(
             event,
@@ -62,7 +66,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get transactions
      */
-    private async _onGetCompanyTransactions(event: IpcMainInvokeEvent, args: any): Promise<any> {
+    private async _onGetCompanyTransactions(event: IpcMainInvokeEvent, args: any): Promise<CompanyTransactions> {
 
         return this._handleAsyncOperation(
             event,
@@ -73,7 +77,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get OAuth user info
      */
-    private async _onGetOAuthUserInfo(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onGetOAuthUserInfo(event: IpcMainInvokeEvent): Promise<OAuthUserInfo> {
 
         return this._handleAsyncOperation(
             event,
@@ -84,7 +88,7 @@ export class IpcMainEvents {
     /*
      * Make an API request to get API user info
      */
-    private async _onGetApiUserInfo(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onGetApiUserInfo(event: IpcMainInvokeEvent): Promise<ApiUserInfo> {
 
         return this._handleAsyncOperation(
             event,
@@ -117,7 +121,7 @@ export class IpcMainEvents {
     /*
      * Bring the window back to the foreground when a login completes
      */
-    private async _onLoginReactivate(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onLoginReactivate(event: IpcMainInvokeEvent): Promise<void> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -128,7 +132,7 @@ export class IpcMainEvents {
     /*
      * Run a logout redirect on the system browser
      */
-    private async _onLogout(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onLogout(event: IpcMainInvokeEvent): Promise<void> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -139,7 +143,7 @@ export class IpcMainEvents {
     /*
      * Perform token refresh
      */
-    private async _onTokenRefresh(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onTokenRefresh(event: IpcMainInvokeEvent): Promise<void> {
 
         return this._handleAsyncOperation(
             event,
@@ -150,7 +154,7 @@ export class IpcMainEvents {
     /*
      * For testing, make the access token act expired
      */
-    private async _onExpireAccessToken(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onExpireAccessToken(event: IpcMainInvokeEvent): Promise<void> {
 
         return this._handleNonAsyncOperation(
             event,
@@ -161,7 +165,7 @@ export class IpcMainEvents {
     /*
      * For testing, make the refresh token act expired
      */
-    private async _onExpireRefreshToken(event: IpcMainInvokeEvent): Promise<any> {
+    private async _onExpireRefreshToken(event: IpcMainInvokeEvent): Promise<void> {
 
         return this._handleNonAsyncOperation(
             event,
