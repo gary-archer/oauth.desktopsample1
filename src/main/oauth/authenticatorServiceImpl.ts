@@ -3,14 +3,13 @@ import {
     BaseTokenRequestHandler,
     GRANT_TYPE_AUTHORIZATION_CODE,
     GRANT_TYPE_REFRESH_TOKEN,
-    StringMap,
     TokenRequest} from '@openid/appauth';
 import {ErrorCodes} from '../../shared/errors/errorCodes';
 import {ErrorFactory} from '../../shared/errors/errorFactory';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {HttpProxy} from '../utilities/httpProxy';
 import {AuthenticatorService} from './authenticatorService';
-import {LoginAsyncAdapter} from './login/loginAsyncAdapter';
+import {LoginRequestHandler} from './login/loginRequestHandler';
 import {LoginRedirectResult} from './login/loginRedirectResult';
 import {LoginState} from './login/loginState';
 import {TokenData} from './tokenData';
@@ -159,13 +158,12 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             // Download metadata from the authorization server if required
             await this._loadMetadata();
 
-            // Run a login on the system browser and get the authorization code
-            const adapter = new LoginAsyncAdapter(
+            // Run a login on the system browser and get the result
+            const handler = new LoginRequestHandler(
                 this._configuration,
                 this._metadata!,
                 this._loginState);
-
-            return await adapter.login(redirectUri);
+            return await handler.execute(redirectUri);
 
         } catch (e: any) {
 
@@ -181,21 +179,15 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
 
         try {
 
-            // Get the PKCE verifier
-            const codeVerifier = result.request.internal!['code_verifier'];
-
-            // Supply PKCE parameters for the code exchange
-            const extras: StringMap = {
-                code_verifier: codeVerifier,
-            };
-
-            // Create the token request
+            // Create the token request including the PKCE code verifier
             const requestJson = {
                 grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
                 code: result.response!.code,
                 redirect_uri: result.request.redirectUri,
                 client_id: this._configuration.clientId,
-                extras,
+                extras: {
+                    code_verifier: result.request.internal!['code_verifier'],
+                },
             };
             const tokenRequest = new TokenRequest(requestJson);
 
@@ -232,18 +224,12 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             // Download metadata from the authorization server if required
             await this._loadMetadata();
 
-            // Supply the scope for access tokens
-            const extras: StringMap = {
-                scope: this._configuration.scope,
-            };
-
             // Create the token request
             const requestJson = {
                 grant_type: GRANT_TYPE_REFRESH_TOKEN,
                 client_id: this._configuration.clientId,
                 refresh_token: this._tokens!.refreshToken!,
                 redirect_uri: '',
-                extras,
             };
             const tokenRequest = new TokenRequest(requestJson);
 

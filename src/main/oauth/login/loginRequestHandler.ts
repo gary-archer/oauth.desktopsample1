@@ -1,5 +1,6 @@
 import {
     AuthorizationError,
+    AuthorizationNotifier,
     AuthorizationRequest,
     AuthorizationRequestHandler,
     AuthorizationRequestResponse,
@@ -7,25 +8,73 @@ import {
     AuthorizationServiceConfiguration,
     BasicQueryStringUtils} from '@openid/appauth';
 import open from 'open';
+import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {NodeCrypto} from '../../utilities/nodeCrypto';
+import {LoginRedirectResult} from './loginRedirectResult';
 import {LoginState} from './loginState';
 
 /*
  * An override of the default authorization handler to perform a login
  */
-export class BrowserLoginRequestHandler extends AuthorizationRequestHandler {
+export class LoginRequestHandler extends AuthorizationRequestHandler {
 
+    private readonly _configuration: OAuthConfiguration;
+    private readonly _metadata: AuthorizationServiceConfiguration;
     private readonly _state: LoginState;
     private _response: AuthorizationRequestResponse | null;
 
-    /*
-     * Set up the base class
-     */
-    public constructor(state: LoginState) {
+    public constructor(
+        configuration: OAuthConfiguration,
+        metadata: AuthorizationServiceConfiguration,
+        state: LoginState) {
 
         super(new BasicQueryStringUtils(), new NodeCrypto());
+        this._configuration = configuration;
+        this._metadata = metadata;
         this._state = state;
         this._response = null;
+    }
+
+    /*
+     * Run the login redirect and listen for the response
+     */
+    public async execute(redirectUri: string): Promise<LoginRedirectResult> {
+
+        // Create the authorization request message and use prompt=login to force a new login
+        // Note however that AWS Cognito does not support that parameter
+        const requestJson = {
+            response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
+            client_id: this._configuration.clientId,
+            redirect_uri: redirectUri,
+            scope: this._configuration.scope,
+            extras: {
+                'prompt': 'login',
+            },
+        };
+        const authorizationRequest = new AuthorizationRequest(requestJson, new NodeCrypto(), true);
+
+        // Set up PKCE for the redirect
+        await authorizationRequest.setupCodeVerifier();
+
+        // Wrap the AppAuth notifier in a promise
+        const notifier = new AuthorizationNotifier();
+        const promise = new Promise<LoginRedirectResult>((resolve) => {
+
+            notifier.setAuthorizationListener(async (
+                request: AuthorizationRequest,
+                response: AuthorizationResponse | null,
+                error: AuthorizationError | null) => {
+
+                resolve({request, response, error});
+            });
+        });
+
+        // Spin up the browser and begin the login
+        this.setAuthorizationNotifier(notifier);
+        await this.performAuthorizationRequest(this._metadata, authorizationRequest);
+
+        // Wait for the result
+        return await promise;
     }
 
     /*
