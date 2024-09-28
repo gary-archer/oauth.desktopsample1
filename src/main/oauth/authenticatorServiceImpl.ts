@@ -11,11 +11,11 @@ import {ErrorFactory} from '../../shared/errors/errorFactory';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {HttpProxy} from '../utilities/httpProxy';
 import {AuthenticatorService} from './authenticatorService';
-import {LoginRequestHandler} from './login/loginRequestHandler';
-import {LoginState} from './login/loginState';
+import {CustomRequestor} from './customRequestor';
+import {LoginRequestHandler} from './loginRequestHandler';
+import {LoginState} from './loginState';
+import {LoopbackWebServer} from './loopbackWebServer';
 import {TokenData} from './tokenData';
-import {CustomRequestor} from './utilities/customRequestor';
-import {LoopbackWebServer} from './utilities/loopbackWebServer';
 
 /*
  * The entry point class for login and token requests

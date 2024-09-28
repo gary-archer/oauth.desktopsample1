@@ -2,7 +2,7 @@
 import getPort, {clearLockedPorts, portNumbers} from 'get-port';
 import Http from 'http';
 import {EventEmitter} from 'node:events';
-import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
+import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 
 /*
  * Manage the local web server which listens on a loopback URL on the desktop user's PC

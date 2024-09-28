@@ -8,10 +8,10 @@ import {
     BasicQueryStringUtils} from '@openid/appauth';
 import EventEmitter from 'node:events';
 import open from 'open';
-import {ErrorFactory} from '../../../shared/errors/errorFactory';
-import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
-import {NodeCrypto} from '../../utilities/nodeCrypto';
+import {ErrorFactory} from '../../shared/errors/errorFactory';
+import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {LoginState} from './loginState';
+import {NodeCrypto} from './nodeCrypto';
 
 /*
  * An override of the default authorization handler to perform a login
