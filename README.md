@@ -42,7 +42,7 @@ After login you can test some basic lifecycle operations, though session managem
 
 ## Further Information
 
-- See blog posts for further details, starting in the [Initial Desktop Sample Overview](https://apisandclients.com/posts/desktop-apps-overview).
+- See blog posts for further details, starting in the [Initial Desktop Sample Overview](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/desktop-apps-overview.mdx).
 - See the [Final Desktop Sample](https://github.com/gary-archer/oauth.desktopsample.final) for a more complete desktop app.
 
 ## Programming Languages
