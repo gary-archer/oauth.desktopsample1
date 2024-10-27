@@ -20,25 +20,25 @@ export class ErrorFormatter {
 
         const lines: ErrorLine[] = [];
 
-        if (error.area.length > 0) {
-            lines.push(this._createErrorLine('Area', error.area));
+        if (error.getArea().length > 0) {
+            lines.push(this.createErrorLine('Area', error.getArea()));
         }
 
-        if (error.errorCode.length > 0) {
-            lines.push(this._createErrorLine('Error Code', error.errorCode));
+        if (error.getErrorCode().length > 0) {
+            lines.push(this.createErrorLine('Error Code', error.getErrorCode()));
         }
 
-        if (error.statusCode > 0) {
-            lines.push(this._createErrorLine('Status Code', error.statusCode.toString()));
+        if (error.getStatusCode() > 0) {
+            lines.push(this.createErrorLine('Status Code', error.getStatusCode().toString()));
         }
 
-        if (error.instanceId > 0) {
-            lines.push(this._createErrorLine('Id', error.instanceId.toString()));
+        if (error.getInstanceId() > 0) {
+            lines.push(this.createErrorLine('Id', error.getInstanceId().toString()));
         }
 
-        if (error.utcTime.length > 0) {
+        if (error.getUtcTime().length > 0) {
 
-            const errorTime = Date.parse(error.utcTime);
+            const errorTime = Date.parse(error.getUtcTime());
             const displayTime = new Date(errorTime).toLocaleString('en', {
                 timeZone: 'utc',
                 day: '2-digit',
@@ -49,15 +49,15 @@ export class ErrorFormatter {
                 second: '2-digit',
                 hour12: false,
             }).replace(/,/g, '');
-            lines.push(this._createErrorLine('UTC Time', displayTime));
+            lines.push(this.createErrorLine('UTC Time', displayTime));
         }
 
-        if (error.details.length > 0) {
-            lines.push(this._createErrorLine('Details', error.details));
+        if (error.getDetails().length > 0) {
+            lines.push(this.createErrorLine('Details', error.getDetails()));
         }
 
-        if (error.url.length > 0) {
-            lines.push(this._createErrorLine('URL', error.url));
+        if (error.getUrl().length > 0) {
+            lines.push(this.createErrorLine('URL', error.getUrl()));
         }
 
         return lines;
@@ -70,7 +70,7 @@ export class ErrorFormatter {
 
         // Render the stack trace as a long string that can be decompiled at https://sourcemaps.info
         if (error.stack) {
-            return this._createErrorLine('Stack', error.stack);
+            return this.createErrorLine('Stack', error.stack);
         }
 
         return null;
@@ -79,7 +79,7 @@ export class ErrorFormatter {
     /*
      * Return an error line as an object
      */
-    private _createErrorLine(label: string, value: string): ErrorLine {
+    private createErrorLine(label: string, value: string): ErrorLine {
 
         return {
             label,

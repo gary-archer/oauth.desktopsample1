@@ -45,19 +45,19 @@ export class ErrorView {
 
         // Get the error into an object
         const error = ErrorFactory.fromException(exception);
-        if (error.errorCode === ErrorCodes.loginRequired) {
+        if (error.getErrorCode() === ErrorCodes.loginRequired) {
 
             // Login required errors are not real exceptions, and we will instead move to the login required page
             LoginNavigation.navigateToLoginRequired();
 
-        } else if (error.errorCode === ErrorCodes.loginCancelled) {
+        } else if (error.getErrorCode() === ErrorCodes.loginCancelled) {
 
             // The frontend ignores this error code and maintains its current state
 
         } else {
 
             // Otherwise render the error details
-            this._renderError(error);
+            this.renderError(error);
         }
     }
 
@@ -73,7 +73,7 @@ export class ErrorView {
     /*
      * Render the error to the UI
      */
-    private _renderError(error: UIError): void {
+    private renderError(error: UIError): void {
 
         // Clear content and make the form visible
         DomUtils.text('#errortitle', '');
@@ -86,15 +86,15 @@ export class ErrorView {
         // Render the error fields
         const formatter = new ErrorFormatter();
         const errorHtml =
-            this._getLinesHtml(formatter.getErrorLines(error)) +
-            this._getStackHtml(formatter.getErrorStack(error));
+            this.getLinesHtml(formatter.getErrorLines(error)) +
+            this.getStackHtml(formatter.getErrorStack(error));
         DomUtils.html('#errorform', errorHtml);
     }
 
     /*
      * Get the HTML for the error lines
      */
-    private _getLinesHtml(errorLines: ErrorLine[]): string {
+    private getLinesHtml(errorLines: ErrorLine[]): string {
 
         const htmlTemplate =
             `{{#lines}}
@@ -114,7 +114,7 @@ export class ErrorView {
     /*
      * Get the HTML for the error stack trace
      */
-    private _getStackHtml(stackLine: ErrorLine | null): string {
+    private getStackHtml(stackLine: ErrorLine | null): string {
 
         if (!stackLine) {
             return '';

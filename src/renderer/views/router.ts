@@ -9,12 +9,12 @@ import {TransactionsView} from './transactionsView';
  */
 export class Router {
 
-    private readonly _apiClient: ApiClient;
-    private readonly _loginRequiredView: LoginRequiredView;
+    private readonly apiClient: ApiClient;
+    private readonly loginRequiredView: LoginRequiredView;
 
     public constructor(apiClient: ApiClient) {
-        this._apiClient = apiClient;
-        this._loginRequiredView = new LoginRequiredView();
+        this.apiClient = apiClient;
+        this.loginRequiredView = new LoginRequiredView();
     }
 
     /*
@@ -26,7 +26,7 @@ export class Router {
         if (this.isInLoginRequiredView()) {
 
             // If the user needs to sign in then render the login required view
-            await this._loginRequiredView.load();
+            await this.loginRequiredView.load();
 
         } else {
 
@@ -35,13 +35,13 @@ export class Router {
             if (transactionsCompany) {
 
                 // If there is an id we move to the transactions view
-                const view = new TransactionsView(this._apiClient, transactionsCompany);
+                const view = new TransactionsView(this.apiClient, transactionsCompany);
                 await view.load();
 
             } else {
 
                 // Otherwise we show the companies list view
-                const view = new CompaniesView(this._apiClient);
+                const view = new CompaniesView(this.apiClient);
                 await view.load();
             }
         }
@@ -51,7 +51,7 @@ export class Router {
      * Ask the router to start the login operation
      */
     public getLoginRequiredView(): LoginRequiredView {
-        return this._loginRequiredView;
+        return this.loginRequiredView;
     }
 
     /*
@@ -66,7 +66,7 @@ export class Router {
      */
     public getTransactionsViewId(): string {
 
-        const args = this._getLocationHashData();
+        const args = this.getLocationHashData();
         if (args) {
             return args.get('company') || '';
         }
@@ -84,7 +84,7 @@ export class Router {
     /*
      * Get hash fragments into a dictionary
      */
-    private _getLocationHashData(): URLSearchParams | null {
+    private getLocationHashData(): URLSearchParams | null {
 
         if (location.hash.startsWith('#')) {
             return new URLSearchParams(location.hash.substring(1));

@@ -5,11 +5,11 @@ import {DomUtils} from './domUtils';
  */
 export class HeaderButtonsView {
 
-    private readonly _onHome: () => void;
-    private readonly _onReloadData: () => void;
-    private readonly _onExpireAccessToken: () => void;
-    private readonly _onExpireRefreshToken: () => void;
-    private readonly _onLogout: () => Promise<void>;
+    private readonly onHome: () => void;
+    private readonly onReloadData: () => void;
+    private readonly onExpireAccessToken: () => void;
+    private readonly onExpireRefreshToken: () => void;
+    private readonly onLogout: () => Promise<void>;
 
     public constructor(
         onHome: () => void,
@@ -18,11 +18,11 @@ export class HeaderButtonsView {
         onExpireRefreshToken: () => void,
         onLogout: () => Promise<void>) {
 
-        this._onHome = onHome;
-        this._onReloadData = onReloadData;
-        this._onExpireAccessToken = onExpireAccessToken;
-        this._onExpireRefreshToken = onExpireRefreshToken;
-        this._onLogout = onLogout;
+        this.onHome = onHome;
+        this.onReloadData = onReloadData;
+        this.onExpireAccessToken = onExpireAccessToken;
+        this.onExpireRefreshToken = onExpireRefreshToken;
+        this.onLogout = onLogout;
     }
 
     /*
@@ -53,11 +53,11 @@ export class HeaderButtonsView {
         DomUtils.html('#headerbuttons', html);
 
         // Button clicks are handled by the parent class
-        DomUtils.onClick('#btnHome', this._onHome);
-        DomUtils.onClick('#btnReloadData', this._onReloadData);
-        DomUtils.onClick('#btnExpireAccessToken', this._onExpireAccessToken);
-        DomUtils.onClick('#btnExpireRefreshToken', this._onExpireRefreshToken);
-        DomUtils.onClick('#btnLogout', this._onLogout);
+        DomUtils.onClick('#btnHome', this.onHome);
+        DomUtils.onClick('#btnReloadData', this.onReloadData);
+        DomUtils.onClick('#btnExpireAccessToken', this.onExpireAccessToken);
+        DomUtils.onClick('#btnExpireRefreshToken', this.onExpireRefreshToken);
+        DomUtils.onClick('#btnLogout', this.onLogout);
     }
 
     /*

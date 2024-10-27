@@ -6,39 +6,38 @@ import {AuthenticatorClient} from './authenticatorClient';
  */
 export class AuthenticatorClientImpl implements AuthenticatorClient {
 
-    private readonly _ipcEvents: IpcRendererEvents;
+    private readonly ipcEvents: IpcRendererEvents;
 
     public constructor(ipcEvents: IpcRendererEvents) {
-
-        this._ipcEvents = ipcEvents;
+        this.ipcEvents = ipcEvents;
     }
 
     /*
      * See if currently logged in
      */
     public async isLoggedIn(): Promise<boolean> {
-        return await this._ipcEvents.isLoggedIn();
+        return await this.ipcEvents.isLoggedIn();
     }
 
     /*
      * Forward to the main side of the app to perform the login work
      */
     public async login(): Promise<void> {
-        return await this._ipcEvents.login();
+        return await this.ipcEvents.login();
     }
 
     /*
      * Forward to the main side of the app to perform the logout work
      */
     public async logout(): Promise<void> {
-        await this._ipcEvents.logout();
+        await this.ipcEvents.logout();
     }
 
     /*
      * Do a token refresh on the main side of the app
      */
     public async refreshAccessToken(): Promise<void> {
-        await this._ipcEvents.tokenRefresh();
+        await this.ipcEvents.tokenRefresh();
     }
 
     /*
@@ -46,7 +45,7 @@ export class AuthenticatorClientImpl implements AuthenticatorClient {
      * The corrupted access token will be sent to the API but rejected when introspected
      */
     public async expireAccessToken(): Promise<void> {
-        await this._ipcEvents.expireAccessToken();
+        await this.ipcEvents.expireAccessToken();
     }
 
     /*
@@ -54,6 +53,6 @@ export class AuthenticatorClientImpl implements AuthenticatorClient {
      * The corrupted refresh token will be sent to the authorization server but rejected
      */
     public async expireRefreshToken(): Promise<void> {
-        await this._ipcEvents.expireRefreshToken();
+        await this.ipcEvents.expireRefreshToken();
     }
 }

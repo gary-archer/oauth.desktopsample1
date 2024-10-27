@@ -23,37 +23,37 @@ import {TokenData} from './tokenData';
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 export class AuthenticatorServiceImpl implements AuthenticatorService {
 
-    private readonly _configuration: OAuthConfiguration;
-    private readonly _customRequestor: CustomRequestor;
-    private _tokens: TokenData | null;
-    private _metadata: AuthorizationServiceConfiguration | null;
-    private readonly _loginState: LoginState;
-    private readonly _eventEmitter: EventEmitter;
+    private readonly configuration: OAuthConfiguration;
+    private readonly customRequestor: CustomRequestor;
+    private readonly loginState: LoginState;
+    private readonly eventEmitter: EventEmitter;
+    private tokens: TokenData | null;
+    private metadata: AuthorizationServiceConfiguration | null;
 
     public constructor(configuration: OAuthConfiguration, httpProxy: HttpProxy) {
 
-        this._configuration = configuration;
-        this._customRequestor = new CustomRequestor(httpProxy);
-        this._metadata = null;
-        this._tokens = null;
-        this._loginState = new LoginState();
-        this._eventEmitter = new EventEmitter();
-        this._setupCallbacks();
+        this.configuration = configuration;
+        this.customRequestor = new CustomRequestor(httpProxy);
+        this.metadata = null;
+        this.tokens = null;
+        this.loginState = new LoginState();
+        this.eventEmitter = new EventEmitter();
+        this.setupCallbacks();
     }
 
     /*
      * The user is logged in if there are valid tokens
      */
     public isLoggedIn(): boolean {
-        return !!this._tokens;
+        return !!this.tokens;
     }
 
     /*
      * Return the URL to the userinfo endpoint when requested
      */
     public async getUserInfoEndpoint(): Promise<string | null> {
-        await this._loadMetadata();
-        return this._metadata?.userInfoEndpoint || null;
+        await this.loadMetadata();
+        return this.metadata?.userInfoEndpoint || null;
     }
 
     /*
@@ -61,8 +61,8 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
      */
     public async getAccessToken(): Promise<string | null> {
 
-        if (this._tokens && this._tokens.accessToken) {
-            return this._tokens.accessToken;
+        if (this.tokens && this.tokens.accessToken) {
+            return this.tokens.accessToken;
         }
 
         return null;
@@ -74,14 +74,14 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
     public async refreshAccessToken(): Promise<string | null> {
 
         // Try to use the refresh token to get a new access token
-        if (this._tokens && this._tokens.refreshToken) {
+        if (this.tokens && this.tokens.refreshToken) {
 
             // Do the work
-            await this._performTokenRefresh();
+            await this.performTokenRefresh();
 
             // Return the new token on success
-            if (this._tokens && this._tokens.accessToken) {
-                return this._tokens.accessToken;
+            if (this.tokens && this.tokens.accessToken) {
+                return this.tokens.accessToken;
             }
         }
 
@@ -93,19 +93,19 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
      */
     public async login(): Promise<void> {
 
-        const result = await this._startLogin();
+        const result = await this.startLogin();
         if (result.error) {
             throw ErrorFactory.fromLoginOperation(result.error, ErrorCodes.loginResponseFailed);
         }
 
-        await this._endLogin(result);
+        await this.endLogin(result);
     }
 
     /*
      * The first desktop sample just does a basic logoutby clearing tokens from memory
      */
     public logout(): void {
-        this._resetDataOnLogout();
+        this.resetDataOnLogout();
     }
 
     /*
@@ -114,8 +114,8 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
      */
     public expireAccessToken(): void {
 
-        if (this._tokens && this._tokens.accessToken) {
-            this._tokens.accessToken = `${this._tokens.accessToken}x`;
+        if (this.tokens && this.tokens.accessToken) {
+            this.tokens.accessToken = `${this.tokens.accessToken}x`;
         }
     }
 
@@ -125,46 +125,46 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
      */
     public expireRefreshToken(): void {
 
-        if (this._tokens && this._tokens.refreshToken) {
-            this._tokens.refreshToken = `${this._tokens.refreshToken}x`;
-            this._tokens.accessToken = null;
+        if (this.tokens && this.tokens.refreshToken) {
+            this.tokens.refreshToken = `${this.tokens.refreshToken}x`;
+            this.tokens.accessToken = null;
         }
     }
 
     /*
      * A helper method to try to load metadata if required
      */
-    private async _loadMetadata() {
+    private async loadMetadata() {
 
-        if (!this._metadata) {
-            this._metadata = await AuthorizationServiceConfiguration.fetchFromIssuer(
-                this._configuration.authority,
-                this._customRequestor);
+        if (!this.metadata) {
+            this.metadata = await AuthorizationServiceConfiguration.fetchFromIssuer(
+                this.configuration.authority,
+                this.customRequestor);
         }
     }
 
     /*
      * Do the work of starting a login redirect
      */
-    private async _startLogin(): Promise<AuthorizationRequestResponse> {
+    private async startLogin(): Promise<AuthorizationRequestResponse> {
 
         try {
 
             // Get a port to listen on and then start the loopback web server
-            const server = new LoopbackWebServer(this._configuration, this._eventEmitter);
+            const server = new LoopbackWebServer(this.configuration, this.eventEmitter);
             const runtimePort = await server.start();
-            const host = this._configuration.loopbackHostname;
-            const redirectUri = `http://${host}:${runtimePort}${this._configuration.redirectPath}`;
+            const host = this.configuration.loopbackHostname;
+            const redirectUri = `http://${host}:${runtimePort}${this.configuration.redirectPath}`;
 
             // Download metadata from the authorization server if required
-            await this._loadMetadata();
+            await this.loadMetadata();
 
             // Run a login on the system browser and get the result
             const handler = new LoginRequestHandler(
-                this._configuration,
-                this._metadata!,
-                this._loginState,
-                this._eventEmitter);
+                this.configuration,
+                this.metadata!,
+                this.loginState,
+                this.eventEmitter);
             return await handler.execute(redirectUri);
 
         } catch (e: any) {
@@ -177,7 +177,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
     /*
      * Swap the authorization code for a refresh token and access token
      */
-    private async _endLogin(result: AuthorizationRequestResponse): Promise<void> {
+    private async endLogin(result: AuthorizationRequestResponse): Promise<void> {
 
         try {
 
@@ -186,7 +186,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
                 grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
                 code: result.response!.code,
                 redirect_uri: result.request.redirectUri,
-                client_id: this._configuration.clientId,
+                client_id: this.configuration.clientId,
                 extras: {
                     code_verifier: result.request.internal!['code_verifier'],
                 },
@@ -194,10 +194,10 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             const tokenRequest = new TokenRequest(requestJson);
 
             // Execute the request to swap the code for tokens
-            const tokenRequestHandler = new BaseTokenRequestHandler(this._customRequestor);
+            const tokenRequestHandler = new BaseTokenRequestHandler(this.customRequestor);
 
             // Perform the authorization code grant exchange
-            const tokenResponse = await tokenRequestHandler.performTokenRequest(this._metadata!, tokenRequest);
+            const tokenResponse = await tokenRequestHandler.performTokenRequest(this.metadata!, tokenRequest);
 
             // Set values from the response
             const newTokenData = {
@@ -207,7 +207,7 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
             };
 
             // Update tokens in memory
-            this._tokens = newTokenData;
+            this.tokens = newTokenData;
 
         } catch (e: any) {
 
@@ -219,25 +219,25 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
     /*
      * Do the work of the token refresh
      */
-    private async _performTokenRefresh(): Promise<void> {
+    private async performTokenRefresh(): Promise<void> {
 
         try {
 
             // Download metadata from the authorization server if required
-            await this._loadMetadata();
+            await this.loadMetadata();
 
             // Create the token request
             const requestJson = {
                 grant_type: GRANT_TYPE_REFRESH_TOKEN,
-                client_id: this._configuration.clientId,
-                refresh_token: this._tokens!.refreshToken!,
+                client_id: this.configuration.clientId,
+                refresh_token: this.tokens!.refreshToken!,
                 redirect_uri: '',
             };
             const tokenRequest = new TokenRequest(requestJson);
 
             // Execute the request to send the refresh token and get new tokens
-            const tokenRequestHandler = new BaseTokenRequestHandler(this._customRequestor);
-            const tokenResponse = await tokenRequestHandler.performTokenRequest(this._metadata!, tokenRequest);
+            const tokenRequestHandler = new BaseTokenRequestHandler(this.customRequestor);
+            const tokenResponse = await tokenRequestHandler.performTokenRequest(this.metadata!, tokenRequest);
 
             // Set values from the response, which may include a new rolling refresh token
             const newTokenData = {
@@ -248,21 +248,21 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
 
             // Maintain existing details if required
             if (!newTokenData.refreshToken) {
-                newTokenData.refreshToken = this._tokens!.refreshToken;
+                newTokenData.refreshToken = this.tokens!.refreshToken;
             }
             if (!newTokenData.idToken) {
-                newTokenData.idToken = this._tokens!.idToken;
+                newTokenData.idToken = this.tokens!.idToken;
             }
 
             // Update tokens in memory and secure storage
-            this._tokens = newTokenData;
+            this.tokens = newTokenData;
 
         } catch (e: any) {
 
             if (e.error === ErrorCodes.refreshTokenExpired) {
 
                 // Handle refresh token expired errors by clearing all token data
-                this._resetDataOnLogout();
+                this.resetDataOnLogout();
 
             } else {
 
@@ -275,14 +275,14 @@ export class AuthenticatorServiceImpl implements AuthenticatorService {
     /*
      * Clear data when the session expires or the user logs out
      */
-    private async _resetDataOnLogout(): Promise<void> {
-        this._tokens = null;
+    private async resetDataOnLogout(): Promise<void> {
+        this.tokens = null;
     }
 
     /*
      * Ensure that the this parameter is available in async callbacks
      */
-    private _setupCallbacks() {
-        this._endLogin = this._endLogin.bind(this);
+    private setupCallbacks() {
+        this.endLogin = this.endLogin.bind(this);
     }
 }

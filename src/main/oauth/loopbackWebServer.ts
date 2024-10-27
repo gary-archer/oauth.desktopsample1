@@ -10,17 +10,17 @@ import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 export class LoopbackWebServer {
 
     // At any one time the server is either running on a single port or not running
-    private static _server: Http.Server | null = null;
-    private static _runtimePort = 0;
+    private static server: Http.Server | null = null;
+    private static runtimePort = 0;
 
     // Instance fields
-    private readonly _configuration: OAuthConfiguration;
-    private readonly _eventEmitter: EventEmitter;
+    private readonly configuration: OAuthConfiguration;
+    private readonly eventEmitter: EventEmitter;
 
     public constructor(oauthConfig: OAuthConfiguration, eventEmitter: EventEmitter) {
-        this._configuration = oauthConfig;
-        this._eventEmitter = eventEmitter;
-        this._setupCallbacks();
+        this.configuration = oauthConfig;
+        this.eventEmitter = eventEmitter;
+        this.setupCallbacks();
     }
 
     /*
@@ -28,38 +28,38 @@ export class LoopbackWebServer {
      */
     public async start(): Promise<number> {
 
-        if (!LoopbackWebServer._server) {
-            await this._startServer();
+        if (!LoopbackWebServer.server) {
+            await this.startServer();
         }
 
-        return LoopbackWebServer._runtimePort;
+        return LoopbackWebServer.runtimePort;
     }
 
     /*
      * Handle starting the server the first time
      */
-    private async _startServer(): Promise<void> {
+    private async startServer(): Promise<void> {
 
         // Get a port to listen on
         const options = {
-            port: portNumbers(this._configuration.loopbackMinPort, this._configuration.loopbackMaxPort),
-            host: this._configuration.loopbackHostname,
+            port: portNumbers(this.configuration.loopbackMinPort, this.configuration.loopbackMaxPort),
+            host: this.configuration.loopbackHostname,
         };
-        LoopbackWebServer._runtimePort = await getPort(options);
+        LoopbackWebServer.runtimePort = await getPort(options);
 
         // Create the server to receive the login response
-        LoopbackWebServer._server = Http.createServer(this._handleBrowserRequest);
+        LoopbackWebServer.server = Http.createServer(this.handleBrowserRequest);
 
         // Start listening for requests
-        LoopbackWebServer._server.listen(LoopbackWebServer._runtimePort, this._configuration.loopbackHostname);
+        LoopbackWebServer.server.listen(LoopbackWebServer.runtimePort, this.configuration.loopbackHostname);
     }
 
     /*
      * Handle an incoming request from the browser running at a URL such as http://127.0.0.1:8001
      */
-    private _handleBrowserRequest(request: Http.IncomingMessage, response: Http.ServerResponse): void {
+    private handleBrowserRequest(request: Http.IncomingMessage, response: Http.ServerResponse): void {
 
-        const url = this._tryParseUrl(request);
+        const url = this.tryParseUrl(request);
         if (!url) {
             response.end();
             return;
@@ -72,25 +72,25 @@ export class LoopbackWebServer {
         }
 
         // Notify the request handler to return the response
-        this._eventEmitter.emit('LOGIN_COMPLETE', args);
+        this.eventEmitter.emit('LOGIN_COMPLETE', args);
 
         // Redirect to the post login location
         response.writeHead(301, {
-            Location: this._configuration.postLoginPage,
+            Location: this.configuration.postLoginPage,
         });
         response.end();
 
         // Stop the web server now that the login attempt has finished
-        LoopbackWebServer._server?.close();
-        LoopbackWebServer._server = null;
-        LoopbackWebServer._runtimePort = 0;
+        LoopbackWebServer.server?.close();
+        LoopbackWebServer.server = null;
+        LoopbackWebServer.runtimePort = 0;
         clearLockedPorts();
     }
 
     /*
      * External notifications could provide malformed input, so parse them safely
      */
-    private _tryParseUrl(request: Http.IncomingMessage): URL | null {
+    private tryParseUrl(request: Http.IncomingMessage): URL | null {
 
         try {
             return new URL(request.url || '', `http://${request.headers.host}`);
@@ -102,7 +102,7 @@ export class LoopbackWebServer {
     /*
      * Ensure that the this parameter is available in async callbacks
      */
-    private _setupCallbacks() {
-        this._handleBrowserRequest = this._handleBrowserRequest.bind(this);
+    private setupCallbacks() {
+        this.handleBrowserRequest = this.handleBrowserRequest.bind(this);
     }
 }
