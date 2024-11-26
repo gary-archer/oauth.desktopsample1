@@ -12,7 +12,11 @@
             ],
             "windows": {
                 "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-			}
+			},
+            "sourceMaps": true,
+            "sourceMapPathOverrides":{
+                "webpack:///./*": "${workspaceRoot}/src/*"
+            }
         },
         {
             "type": "chrome",
