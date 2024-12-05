@@ -184,7 +184,7 @@ export class IpcMainEvents {
 
         try {
 
-            if (!event.senderFrame.url.startsWith('file:/')) {
+            if (!event.senderFrame?.url.startsWith('file:/')) {
                 throw ErrorFactory.fromIpcForbiddenError();
             }
 
@@ -215,7 +215,7 @@ export class IpcMainEvents {
         action: () => any): Promise<any> {
 
         try {
-            if (!event.senderFrame.url.startsWith('file:/')) {
+            if (!event.senderFrame?.url.startsWith('file:/')) {
                 throw ErrorFactory.fromIpcForbiddenError();
             }
 
