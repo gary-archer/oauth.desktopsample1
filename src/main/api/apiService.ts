@@ -5,7 +5,7 @@ import {CompanyTransactions} from '../../shared/api/companyTransactions';
 import {OAuthUserInfo} from '../../shared/api/oauthUserInfo';
 import {ErrorFactory} from '../../shared/errors/errorFactory';
 import {Configuration} from '../configuration/configuration';
-import {AuthenticatorService} from '../oauth/authenticatorService';
+import {OAuthService} from '../oauth/oauthService';
 import {AxiosUtils} from '../utilities/axiosUtils';
 import {HttpProxy} from '../utilities/httpProxy';
 
@@ -15,16 +15,16 @@ import {HttpProxy} from '../utilities/httpProxy';
 export class ApiService {
 
     private readonly configuration: Configuration;
-    private readonly authenticatorService: AuthenticatorService;
+    private readonly oauthService: OAuthService;
     private readonly httpProxy: HttpProxy;
 
     public constructor(
         configuration: Configuration,
-        authenticatorService: AuthenticatorService,
+        oauthService: OAuthService,
         httpProxy: HttpProxy) {
 
         this.configuration = configuration;
-        this.authenticatorService = authenticatorService;
+        this.oauthService = oauthService;
         this.httpProxy = httpProxy;
     }
 
@@ -51,7 +51,7 @@ export class ApiService {
      */
     public async getOAuthUserInfo() : Promise<OAuthUserInfo | null> {
 
-        const url = await this.authenticatorService.getUserInfoEndpoint();
+        const url = await this.oauthService.getUserInfoEndpoint();
         if (!url) {
             return null;
         }
@@ -87,7 +87,7 @@ export class ApiService {
         try {
 
             // A logic is required if we don't have an access token
-            const accessToken = await this.authenticatorService.getAccessToken();
+            const accessToken = await this.oauthService.getAccessToken();
             if (!accessToken) {
                 throw ErrorFactory.fromLoginRequired();
             }

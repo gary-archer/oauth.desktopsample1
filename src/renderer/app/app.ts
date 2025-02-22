@@ -1,7 +1,7 @@
 import {ApiClient} from '../api/apiClient';
 import {IpcRendererEvents} from '../ipcRendererEvents';
-import {AuthenticatorClient} from '../oauth/authenticatorClient';
-import {AuthenticatorClientImpl} from '../oauth/authenticatorClientImpl';
+import {OAuthClient} from '../oauth/oauthClient';
+import {OAuthClientImpl} from '../oauth/oauthClientImpl';
 import {ErrorView} from '../views/errorView';
 import {HeaderButtonsView} from '../views/headerButtonsView';
 import {LoginNavigation} from '../views/loginNavigation';
@@ -14,7 +14,7 @@ import {TitleView} from '../views/titleView';
 export class App {
 
     private ipcEvents!: IpcRendererEvents;
-    private authenticatorClient!: AuthenticatorClient;
+    private oauthClient!: OAuthClient;
     private apiClient!: ApiClient;
     private router!: Router;
     private titleView!: TitleView;
@@ -87,10 +87,10 @@ export class App {
         this.ipcEvents = new IpcRendererEvents(window);
 
         // Initialise OAuth handling
-        this.authenticatorClient = new AuthenticatorClientImpl(this.ipcEvents);
+        this.oauthClient = new OAuthClientImpl(this.ipcEvents);
 
         // Create a client to reliably call the API
-        this.apiClient = new ApiClient(this.ipcEvents, this.authenticatorClient);
+        this.apiClient = new ApiClient(this.ipcEvents, this.oauthClient);
 
         // Create our simple router class
         this.router = new Router(this.apiClient);
@@ -129,7 +129,7 @@ export class App {
      */
     private async loadUserInfo(): Promise<void> {
 
-        if (await this.authenticatorClient.isLoggedIn()) {
+        if (await this.oauthClient.isLoggedIn()) {
             await this.titleView.loadUserInfo(this.apiClient);
         }
     }
@@ -203,7 +203,7 @@ export class App {
 
             // Do the work of the login
             this.router.getLoginRequiredView().showProgress();
-            await this.authenticatorClient.login();
+            await this.oauthClient.login();
 
             // Move back to the location that took us to login required
             LoginNavigation.restorePreLoginLocation();
@@ -256,7 +256,7 @@ export class App {
     private async onLogout(): Promise<void> {
 
         // The basic logout for this sample just removes tokens
-        this.authenticatorClient.logout();
+        this.oauthClient.logout();
 
         // Navigate to the logged out view
         location.hash = '#loggedout';
@@ -266,14 +266,14 @@ export class App {
      * Force a new access token to be retrieved
      */
     private async onExpireAccessToken(): Promise<void> {
-        await this.authenticatorClient.expireAccessToken();
+        await this.oauthClient.expireAccessToken();
     }
 
     /*
      * Force the next refresh token request to fail
      */
     private async onExpireRefreshToken(): Promise<void> {
-        await this.authenticatorClient.expireRefreshToken();
+        await this.oauthClient.expireRefreshToken();
     }
 
     /*

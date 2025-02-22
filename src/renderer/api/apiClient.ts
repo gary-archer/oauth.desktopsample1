@@ -4,7 +4,7 @@ import {CompanyTransactions} from '../../shared/api/companyTransactions';
 import {OAuthUserInfo} from '../../shared/api/oauthUserInfo';
 import {ErrorFactory} from '../../shared/errors/errorFactory';
 import {IpcRendererEvents} from '../ipcRendererEvents';
-import {AuthenticatorClient} from '../oauth/authenticatorClient';
+import {OAuthClient} from '../oauth/oauthClient';
 
 /*
  * API operations from the renderer side of the app
@@ -12,12 +12,12 @@ import {AuthenticatorClient} from '../oauth/authenticatorClient';
 export class ApiClient {
 
     private readonly ipcEvents: IpcRendererEvents;
-    private readonly authenticatorClient: AuthenticatorClient;
+    private readonly oauthClient: OAuthClient;
 
-    public constructor(ipcEvents: IpcRendererEvents, authenticatorClient: AuthenticatorClient) {
+    public constructor(ipcEvents: IpcRendererEvents, oauthClient: OAuthClient) {
 
         this.ipcEvents = ipcEvents;
-        this.authenticatorClient = authenticatorClient;
+        this.oauthClient = oauthClient;
     }
 
     /*
@@ -67,7 +67,7 @@ export class ApiClient {
             }
 
             // Try to refresh the access token stored on the main side of the app
-            await this.authenticatorClient.refreshAccessToken();
+            await this.oauthClient.refreshAccessToken();
 
             // Call the API again with the new access token
             return await callback();

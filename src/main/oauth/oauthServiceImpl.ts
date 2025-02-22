@@ -10,7 +10,7 @@ import {ErrorCodes} from '../../shared/errors/errorCodes';
 import {ErrorFactory} from '../../shared/errors/errorFactory';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {HttpProxy} from '../utilities/httpProxy';
-import {AuthenticatorService} from './authenticatorService';
+import {OAuthService} from './oauthService';
 import {CustomRequestor} from './customRequestor';
 import {LoginRequestHandler} from './loginRequestHandler';
 import {LoginState} from './loginState';
@@ -21,7 +21,7 @@ import {TokenData} from './tokenData';
  * The entry point class for login and token requests
  */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-export class AuthenticatorServiceImpl implements AuthenticatorService {
+export class OAuthServiceImpl implements OAuthService {
 
     private readonly configuration: OAuthConfiguration;
     private readonly customRequestor: CustomRequestor;

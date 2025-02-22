@@ -1,10 +1,10 @@
 import {IpcRendererEvents} from '../ipcRendererEvents';
-import {AuthenticatorClient} from './authenticatorClient';
+import {OAuthClient} from './oauthClient';
 
 /*
  * The entry point class for OAuth related requests in the renderer process
  */
-export class AuthenticatorClientImpl implements AuthenticatorClient {
+export class OAuthClientImpl implements OAuthClient {
 
     private readonly ipcEvents: IpcRendererEvents;
 

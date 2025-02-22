@@ -8,8 +8,8 @@ import {UIError} from '../shared/errors/uiError';
 import {IpcEventNames} from '../shared/ipcEventNames';
 import {ApiService} from './api/apiService';
 import {Configuration} from './configuration/configuration';
-import {AuthenticatorService} from './oauth/authenticatorService';
-import {AuthenticatorServiceImpl} from './oauth/authenticatorServiceImpl';
+import {OAuthService} from './oauth/oauthService';
+import {OAuthServiceImpl} from './oauth/oauthServiceImpl';
 import {HttpProxy} from './utilities/httpProxy';
 
 /*
@@ -19,7 +19,7 @@ export class IpcMainEvents {
 
     private readonly configuration: Configuration;
     private readonly httpProxy: HttpProxy;
-    private readonly authenticatorService: AuthenticatorService;
+    private readonly oauthService: OAuthService;
     private readonly apiService: ApiService;
     private window: BrowserWindow | null;
 
@@ -27,8 +27,8 @@ export class IpcMainEvents {
         this.configuration = configuration;
         this.httpProxy = new HttpProxy(this.configuration.app.useProxy, this.configuration.app.proxyUrl);
         this.window = null;
-        this.authenticatorService = new AuthenticatorServiceImpl(this.configuration.oauth, this.httpProxy);
-        this.apiService = new ApiService(this.configuration, this.authenticatorService, this.httpProxy);
+        this.oauthService = new OAuthServiceImpl(this.configuration.oauth, this.httpProxy);
+        this.apiService = new ApiService(this.configuration, this.oauthService, this.httpProxy);
         this.setupCallbacks();
     }
 
@@ -104,7 +104,7 @@ export class IpcMainEvents {
         return this.handleNonAsyncOperation(
             event,
             IpcEventNames.ON_IS_LOGGED_IN,
-            () => this.authenticatorService.isLoggedIn());
+            () => this.oauthService.isLoggedIn());
     }
 
     /*
@@ -115,7 +115,7 @@ export class IpcMainEvents {
         return this.handleAsyncOperation(
             event,
             IpcEventNames.ON_LOGIN,
-            () => this.authenticatorService.login());
+            () => this.oauthService.login());
     }
 
     /*
@@ -137,7 +137,7 @@ export class IpcMainEvents {
         return this.handleNonAsyncOperation(
             event,
             IpcEventNames.ON_LOGOUT,
-            () => this.authenticatorService.logout());
+            () => this.oauthService.logout());
     }
 
     /*
@@ -148,7 +148,7 @@ export class IpcMainEvents {
         return this.handleAsyncOperation(
             event,
             IpcEventNames.ON_TOKEN_REFRESH,
-            () => this.authenticatorService.refreshAccessToken());
+            () => this.oauthService.refreshAccessToken());
     }
 
     /*
@@ -159,7 +159,7 @@ export class IpcMainEvents {
         return this.handleNonAsyncOperation(
             event,
             IpcEventNames.ON_EXPIRE_ACCESS_TOKEN,
-            () => this.authenticatorService.expireAccessToken());
+            () => this.oauthService.expireAccessToken());
     }
 
     /*
@@ -170,7 +170,7 @@ export class IpcMainEvents {
         return this.handleNonAsyncOperation(
             event,
             IpcEventNames.ON_EXPIRE_REFRESH_TOKEN,
-            () => this.authenticatorService.expireRefreshToken());
+            () => this.oauthService.expireRefreshToken());
     }
 
     /*

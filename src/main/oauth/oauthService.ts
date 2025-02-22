@@ -1,7 +1,7 @@
 /*
- * An interface to represent authentication related operations
+ * An interface to represent OAuth related operations
  */
-export interface AuthenticatorService {
+export interface OAuthService {
 
     // Indicate if the user is logged in
     isLoggedIn(): boolean;
