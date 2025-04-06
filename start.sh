@@ -31,16 +31,13 @@ case "$(uname -s)" in
 	;;
 esac
 
-if [ ! -d 'node_modules' ]; then
-  
-  #
-  # Download dependencies
-  #
-  npm install
-  if [ $? -ne 0 ]; then
-    echo 'Problem encountered downloading dependencies'
-    exit
-  fi
+#
+# Download dependencies
+#
+npm install
+if [ $? -ne 0 ]; then
+  echo 'Problem encountered downloading dependencies'
+  exit
 fi
 
 #
