@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <title>Login Complete</title>
+
+        <script>
+            window.addEventListener('DOMContentLoaded', function() {
+
+                if (window.location.search.indexOf('error=') !== -1) {
+                    var result = document.getElementById('result');
+                    result.innerText = 'Problem encountered during an external login';
+                    result.style.color = 'red';
+                }
+            });
+        </script>
+
+        <style>
+            #container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-family: sans-serif;
+                padding: 10px;
+                font-size: 20px;
+            }
+            #heading {
+                color: #2196F3;
+            }
+        </style>
+    </head>
+    <body>
+        <div id='container'>
+            <h3 id='heading'>Login Complete</h3>
+            <h5 id='result'>You are signed in and you can close this window</h5>
+        </div>
+    </body>
+</html>
