@@ -81,6 +81,13 @@ export class IpcRendererEvents {
     }
 
     /*
+     * Ask the main side of the app to clear login state after certain errors
+     */
+    public async clearLoginState(): Promise<void> {
+        await this.sendMessage(IpcEventNames.ON_CLEAR_LOGIN_STATE, {});
+    }
+
+    /*
      * For testing, ask the main side to make the access token act expired
      */
     public async expireAccessToken(): Promise<void> {

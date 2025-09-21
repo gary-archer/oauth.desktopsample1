@@ -142,6 +142,16 @@ export class IpcMainEvents {
     }
 
     /*
+     * Clear login state after certain errors
+     */
+    private async onClearLoginState(event: IpcMainInvokeEvent): Promise<void> {
+
+        return this.handleNonAsyncOperation(
+            event,
+            () => this.oauthService.clearLoginState());
+    }
+
+    /*
      * For testing, make the access token act expired
      */
     private async onExpireAccessToken(event: IpcMainInvokeEvent): Promise<void> {

@@ -15,6 +15,7 @@ export class IpcEventNames {
     public static readonly ON_LOGIN_REACTIVATE = 'login_reactivate';
     public static readonly ON_LOGOUT = 'oauth_logout';
     public static readonly ON_TOKEN_REFRESH = 'oauth_tokenrefresh';
+    public static readonly ON_CLEAR_LOGIN_STATE = 'oauth_clearstate';
     public static readonly ON_EXPIRE_ACCESS_TOKEN = 'oauth_expireaccesstoken';
     public static readonly ON_EXPIRE_REFRESH_TOKEN = 'oauth_expirerefreshtoken';
 }

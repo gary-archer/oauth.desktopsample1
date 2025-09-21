@@ -34,6 +34,13 @@ export class OAuthClientImpl implements OAuthClient {
     }
 
     /*
+     * Allow the login state to be cleared when required
+     */
+    public async clearLoginState(): Promise<void> {
+        await this.ipcEvents.clearLoginState();
+    }
+
+    /*
      * Do a token refresh on the main side of the app
      */
     public async refreshAccessToken(): Promise<void> {

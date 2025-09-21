@@ -105,7 +105,14 @@ export class OAuthServiceImpl implements OAuthService {
      * The first desktop sample just does a basic logoutby clearing tokens from memory
      */
     public logout(): void {
-        this.resetDataOnLogout();
+        this.clearLoginState();
+    }
+
+    /*
+     * Allow the login state to be cleared when required
+     */
+    public clearLoginState(): void {
+        this.tokens = null;
     }
 
     /*
@@ -262,7 +269,7 @@ export class OAuthServiceImpl implements OAuthService {
             if (e.error === ErrorCodes.refreshTokenExpired) {
 
                 // Handle refresh token expired errors by clearing all token data
-                this.resetDataOnLogout();
+                this.clearLoginState();
 
             } else {
 
@@ -270,13 +277,6 @@ export class OAuthServiceImpl implements OAuthService {
                 throw ErrorFactory.fromTokenError(e, ErrorCodes.tokenRefreshFailed);
             }
         }
-    }
-
-    /*
-     * Clear data when the session expires or the user logs out
-     */
-    private async resetDataOnLogout(): Promise<void> {
-        this.tokens = null;
     }
 
     /*

@@ -15,6 +15,9 @@ export interface OAuthClient {
     // Run the logout logic
     logout(): Promise<void>;
 
+    // Allow the app to clear its login state after certain errors
+    clearLoginState(): Promise<void>;
+
     // For testing, make the access token act expired
     expireAccessToken(): Promise<void>;
 

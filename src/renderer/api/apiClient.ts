@@ -69,8 +69,24 @@ export class ApiClient {
             // Try to refresh the access token stored on the main side of the app
             await this.oauthClient.refreshAccessToken();
 
-            // Call the API again with the new access token
-            return await callback();
+            try {
+
+                // Call the API again with the new access token
+                return await callback();
+
+            } catch (e2: any) {
+
+                // Report retry errors
+                const error2 = ErrorFactory.fromException(e2);
+                if (error2.getStatusCode() !== 401) {
+                    throw error2;
+                }
+
+                // A permanent API 401 error triggers a new login.
+                // This could be caused by an invalid API configuration.
+                this.oauthClient.clearLoginState();
+                throw ErrorFactory.fromLoginRequired();
+            }
         }
     }
 }

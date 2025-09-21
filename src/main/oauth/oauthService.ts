@@ -21,6 +21,9 @@ export interface OAuthService {
     // Run the logout logic
     logout(): void;
 
+    // Allow the app to clear its login state after certain errors
+    clearLoginState(): void;
+
     // Update the access token to make it act like it is expired
     expireAccessToken(): void;
 
