@@ -18,7 +18,7 @@ The app uses user attributes from both the OpenID Connect userinfo endpoint and 
 
 ## Local Development Quick Start
 
-First ensure that Node.js 22+ is installed.\
+First ensure that Node.js 24+ is installed.\
 Then build and run the app via this command, to trigger an OpenID Connect desktop flow:
 
 ```bash
