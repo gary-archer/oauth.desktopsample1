@@ -12,10 +12,8 @@
   },
   "scripts": {
     "lint": "npx eslint . --ignore-pattern dist",
-    "build": "npm run webpackMain && npm run webpackRenderer",
     "start": "./start.sh",
-    "webpackMain": "NODE_OPTIONS='--import tsx' webpack --config webpack/main.config.ts",
-    "webpackRenderer": "NODE_OPTIONS='--import tsx' webpack --config webpack/renderer.config.ts"
+    "build": "./build.sh"
   },
   "dependencies": {
     "@openid/appauth": "^1.3.2",

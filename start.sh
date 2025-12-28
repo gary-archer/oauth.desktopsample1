@@ -43,11 +43,9 @@ fi
 #
 # Copy deployable assets that are not Javascript bundles
 #
-if [ -d 'dist' ]; then
-  rm -rf dist
-fi
+rm -rf dist 2>/dev/null
 mkdir dist
-cp index.html desktop.config.json *.css package.json src/preload.js dist
+cp index.html desktop.config.json css/* package.json src/preload.js dist
 
 #
 # Check code quality
@@ -59,13 +57,24 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Build the code
+# Build the code in watch mode
 #
-npm run build
-if [ $? -ne 0 ]; then
-  echo 'Problem encountered building the desktop app'
-  exit
+echo 'Bulding application bundles ...'
+if [ "$PLATFORM" == 'MACOS' ]; then
+
+  open -a Terminal ./build.sh
+
+elif [ "$PLATFORM" == 'WINDOWS' ]; then
+  
+  GIT_BASH="C:\Program Files\Git\git-bash.exe"
+  "$GIT_BASH" -c ./build.sh &
+
+elif [ "$PLATFORM" == 'LINUX' ]; then
+
+  gnome-terminal -- ./build.sh
 fi
+sleep 5
+
 
 #
 # On Linux, work around this Electron issue:
@@ -76,7 +85,7 @@ if [ "$PLATFORM" == 'LINUX' ]; then
 fi
 
 #
-# Run differently depending on the platform
+# Run the app using Electron's platform support
 #
 npx electron ./dist
 if [ $? -ne 0 ]; then
