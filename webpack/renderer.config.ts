@@ -46,12 +46,12 @@ const config: webpack.Configuration = {
     },
     output: {
 
-        // Output bundles to the dist folder
+        // Output ECMAScript bundles to the dist folder
         path: path.resolve(dirname, './dist'),
         filename: '[name].bundle.js',
         module: true,
 
-        // Enable stepping through the SPA's TypeScript code in the Visual Studio Code debugger
+        // Enable stepping through frontend TypeScript code in the Visual Studio Code debugger
         devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
     },
     experiments: {
