@@ -73,8 +73,13 @@ elif [ "$PLATFORM" == 'LINUX' ]; then
 
   gnome-terminal -- ./build.sh
 fi
-sleep 5
 
+#
+# Wait for built bundles to become available
+#
+while [ ! -f ./dist/app.bundle.js ]; do
+  sleep 1
+done
 
 #
 # On Linux, work around this Electron issue:
