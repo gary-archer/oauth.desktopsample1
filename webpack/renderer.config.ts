@@ -49,9 +49,13 @@ const config: webpack.Configuration = {
         // Output bundles to the dist folder
         path: path.resolve(dirname, './dist'),
         filename: '[name].bundle.js',
+        module: true,
 
-        // This setting enables us to step through the debugger in Visual Studio Code
+        // Enable stepping through the SPA's TypeScript code in the Visual Studio Code debugger
         devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
+    },
+    experiments: {
+        outputModule: true,
     },
     optimization: {
 

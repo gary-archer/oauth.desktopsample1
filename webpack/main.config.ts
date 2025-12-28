@@ -10,11 +10,8 @@ const config: webpack.Configuration = {
     // The initial sample only builds for development
     mode: 'development',
 
-    // Build for a node.js target that uses modules
+    // Build for a node.js target
     target: ['electron-main'],
-    experiments: {
-        outputModule: true,
-    },
 
     // Always output source maps since we need to decompile bundles
     devtool: 'source-map',
@@ -49,11 +46,14 @@ const config: webpack.Configuration = {
     },
     output: {
 
-        // Output bundles to the dist folder
+        // Output ECMAScript bundles to a dist folder
         path: path.resolve(dirname, './dist'),
         filename: 'main.bundle.js',
-        chunkFormat: 'module',
-    }
+        module: true,
+    },
+    experiments: {
+        outputModule: true,
+    },
 };
 
 export default config;
