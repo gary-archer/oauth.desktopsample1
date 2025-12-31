@@ -46,12 +46,16 @@ const config: webpack.Configuration = {
     },
     output: {
 
+        // Enable stepping through frontend TypeScript code in the Visual Studio Code debugger
+        devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
+
         // Output ECMAScript bundles to the dist folder
         path: path.resolve(dirname, './dist'),
         filename: '[name].bundle.js',
-
-        // Enable stepping through frontend TypeScript code in the Visual Studio Code debugger
-        devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
+        module: true,
+    },
+    experiments: {
+        outputModule: true,
     },
     optimization: {
 

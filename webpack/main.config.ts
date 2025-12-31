@@ -46,7 +46,7 @@ const config: webpack.Configuration = {
     },
     output: {
 
-        // We need to Output ECMAScript bundles to the dist folder
+        // For the main build, using ESM modules prevents CommonJS output
         path: path.resolve(dirname, './dist'),
         filename: 'main.bundle.js',
         module: true,
