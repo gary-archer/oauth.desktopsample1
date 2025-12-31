@@ -2,7 +2,6 @@
   "name": "basicdesktopapp",
   "version": "1.0.0",
   "description": "An OpenID Connect secured Desktop App using the AppAuth-JS security",
-  "keywords": [],
   "author": "Gary Archer",
   "license": "MIT",
   "main": "main.bundle.js",
@@ -27,6 +26,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/mustache": "^4.2.5",
+    "@types/node": "^24.10.3",
     "electron": "^39.2.2",
     "eslint": "^9.39.2",
     "ts-loader": "^9.5.4",

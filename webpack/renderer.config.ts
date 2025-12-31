@@ -7,13 +7,13 @@ import webpack from 'webpack';
 const dirname = process.cwd();
 const config: webpack.Configuration = {
 
-    // Let webpack know this is a debug build
+    // The initial desktop code sample only builds for development
     mode: 'development',
 
     // Build for a web target
     target: ['web'],
 
-    // Always output source maps since we are building bundles
+    // Always output source maps so that we can decompile bundles
     devtool: 'source-map',
 
     // Set the working folder
@@ -49,13 +49,9 @@ const config: webpack.Configuration = {
         // Output ECMAScript bundles to the dist folder
         path: path.resolve(dirname, './dist'),
         filename: '[name].bundle.js',
-        module: true,
 
         // Enable stepping through frontend TypeScript code in the Visual Studio Code debugger
         devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
-    },
-    experiments: {
-        outputModule: true,
     },
     optimization: {
 
@@ -68,8 +64,8 @@ const config: webpack.Configuration = {
                     test: /node_modules/,
                     enforce: true,
                 },
-            }
-        }
+            },
+        },
     }
 };
 

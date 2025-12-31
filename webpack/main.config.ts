@@ -7,13 +7,13 @@ import webpack from 'webpack';
 const dirname = process.cwd();
 const config: webpack.Configuration = {
 
-    // The initial sample only builds for development
+    // The initial desktop code sample only builds for development
     mode: 'development',
 
     // Build for a node.js target
     target: ['electron-main'],
 
-    // Always output source maps since we need to decompile bundles
+    // Always output source maps so that we can decompile bundles
     devtool: 'source-map',
 
     // Set the working folder
@@ -21,7 +21,7 @@ const config: webpack.Configuration = {
 
     entry: {
         // Pull in all dependencies starting from the main file
-        app: ['./main.ts']
+        app: ['./main.ts'],
     },
     module: {
         rules: [
@@ -36,8 +36,8 @@ const config: webpack.Configuration = {
                     },
                 }],
                 exclude: /node_modules/,
-            }
-        ]
+            },
+        ],
     },
     resolve: {
 
@@ -46,7 +46,7 @@ const config: webpack.Configuration = {
     },
     output: {
 
-        // Output ECMAScript bundles to the dist folder
+        // We need to Output ECMAScript bundles to the dist folder
         path: path.resolve(dirname, './dist'),
         filename: 'main.bundle.js',
         module: true,
