@@ -12,22 +12,13 @@
             ],
             "windows": {
                 "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-			},
-            "sourceMaps": true,
-            "sourceMapPathOverrides":{
-                "webpack:///./*": "${workspaceRoot}/src/*"
-            }
+			}
         },
         {
             "type": "chrome",
             "request": "attach",
             "name": "Renderer Process",
-            "port": 9223,
-            "webRoot": "${workspaceRoot}/src/*",
-            "sourceMaps": true,
-            "sourceMapPathOverrides":{
-                "webpack:///./*": "${workspaceRoot}/dist/*"
-            }
+            "port": 9223
         }
     ],
     "compounds": [
