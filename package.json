@@ -10,7 +10,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "lint": "npx eslint . --ignore-pattern dist",
+    "lint": "eslint .",
     "start": "./start.sh",
     "build": "./build.sh"
   },
