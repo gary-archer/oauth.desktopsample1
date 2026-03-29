@@ -1,7 +1,7 @@
+import {AuthorizationError} from '@openid/appauth';
 import {Response} from 'undici';
 import {ErrorCodes} from './errorCodes';
 import {UIError} from './uiError';
-import { AuthorizationError } from '@openid/appauth';
 
 /*
  * A class to manage processing errors and translation to a presentation format
@@ -162,7 +162,7 @@ export class ErrorFactory {
 
         const error = new UIError(
             source,
-            ErrorCodes.responseError,
+            ErrorCodes.fetchError,
             `An error response was returned from the ${source}`
         );
         error.setStatusCode(response.status);
@@ -175,8 +175,7 @@ export class ErrorFactory {
     public static async getFromOAuthFetchResponseError(response: Response): Promise<UIError> {
 
         const error = await this.getFromFetchResponseError(response, 'authorization server');
-        let code = 'oauth_fetch_error';
-        let message = 'Problem encountered during an OAuth request';
+        let details = 'Problem encountered during an OAuth request';
 
         try {
 
@@ -184,19 +183,17 @@ export class ErrorFactory {
             if (oauthError) {
 
                 if (oauthError?.error) {
-                    code = oauthError.error;
+                    error.setErrorCode(oauthError.error);
                 }
                 if (oauthError?.error_description) {
-                    message = oauthError.error_description;
+                    details = oauthError.error_description;
                 }
             }
         } catch {
             // Swallow JSON parse errors for unexpected responses
         }
 
-        error.setErrorCode(code);
-        error.setDetails(message);
-
+        error.setDetails(details);
         return error;
     }
 
@@ -206,6 +203,7 @@ export class ErrorFactory {
     public static async getFromApiResponseError(response: Response): Promise<UIError> {
 
         const error = await this.getFromFetchResponseError(response, 'web API');
+        let details = 'Problem encountered during an API request';
 
         try {
             // The API returns JSON responses for all errors so try to read JSON
@@ -214,7 +212,7 @@ export class ErrorFactory {
 
                 if (apiError?.code && apiError?.message) {
                     error.setErrorCode(apiError.code);
-                    error.setDetails(apiError.message);
+                    details = apiError.message;
                 }
 
                 // Set extra details returned for 5xx errors
@@ -226,6 +224,7 @@ export class ErrorFactory {
             // Swallow JSON parse errors for unexpected responses
         }
 
+        error.setDetails(details);
         return error;
     }
 

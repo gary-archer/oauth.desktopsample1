@@ -30,14 +30,14 @@ export class ErrorCodes {
     // Indicates an untrusted sender of IPC events
     public static readonly ipcForbidden = 'ipc_forbidden_error';
 
+    // A general fetch error
+    public static readonly fetchError = 'fetch_error';
+
     // An error making a fetch request to get API data
     public static readonly connectionError = 'connection_error';
 
     // An error receiving API data as JSON
     public static readonly dataError = 'data_error';
-
-    // An error response fropm the API
-    public static readonly responseError = 'response_error';
 
     // Returned by the API when the user edits the browser URL and ties to access an unauthorised company
     public static readonly companyNotFound = 'company_not_found';

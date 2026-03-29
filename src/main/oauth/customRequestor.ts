@@ -29,8 +29,8 @@ export class CustomRequestor extends Requestor {
                 dispatcher: this.httpProxy.getDispatcher() || undefined,
             };
 
-            if (settings.data) {
-                options.body = settings.data as string;
+            if (typeof settings.data === 'string') {
+                options.body = settings.data;
             }
 
             const response = await fetch(url || '', options);
