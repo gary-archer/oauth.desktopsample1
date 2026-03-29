@@ -265,7 +265,7 @@ export class OAuthServiceImpl implements OAuthService {
 
         } catch (e: any) {
 
-            const error = ErrorFactory.fromTokenError(e, ErrorCodes.authorizationCodeGrantFailed);
+            const error = ErrorFactory.fromException(e);
             if (error.getErrorCode() === ErrorCodes.refreshTokenExpired) {
 
                 // Handle refresh token expired errors by clearing all token data
