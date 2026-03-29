@@ -30,11 +30,11 @@ export class ErrorCodes {
     // Indicates an untrusted sender of IPC events
     public static readonly ipcForbidden = 'ipc_forbidden_error';
 
-    // An error making an Ajax call to get API data
-    public static readonly networkError = 'network_error';
+    // An error making a fetch request to get API data
+    public static readonly connectionError = 'connection_error';
 
     // An error receiving API data as JSON
-    public static readonly jsonDataError = 'json_data_error';
+    public static readonly dataError = 'data_error';
 
     // An error response fropm the API
     public static readonly responseError = 'response_error';

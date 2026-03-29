@@ -119,10 +119,10 @@ export class LoginRequestHandler extends AuthorizationRequestHandler {
         if (error) {
 
             // Handle error responses
-            const errorDescription = args.get('error_description') || '';
+            const errorDescription = args.get('error_description') || 'Authorization response error';
             const errorJson = {
                 error,
-                error_description: errorDescription || '',
+                error_description: errorDescription,
             };
             authorizationError = new AuthorizationError(errorJson);
 
