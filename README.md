@@ -25,7 +25,7 @@ Then build and run the app with the following command:
 ./start.sh
 ```
 
-The app prompts to run an OpenID Connect code flow and authenticate the user.\
+The app prompts to run a code flow and authenticate the user.\
 The login runs in the default system browser and the app cannot access the user's credentials:
 
 ![Desktop App Login](./images/login.png)
