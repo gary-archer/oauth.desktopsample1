@@ -6,7 +6,7 @@
 
 ## Overview
 
-An initial cross-platform demo desktop app using AppAuth and OpenID Connect.
+An initial cross-platform demo desktop app using the AppAuth pattern to implement OAuth and OpenID Connect.
 
 ## Views
 
