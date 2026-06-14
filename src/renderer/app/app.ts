@@ -38,6 +38,9 @@ export class App {
 
         try {
 
+            // Import the live reload module
+            await import('./livereload');
+
             // Do the initial render before getting data
             this.initialRender();
 

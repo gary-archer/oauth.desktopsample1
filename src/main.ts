@@ -95,7 +95,7 @@ class Main {
             let policy = '';
             policy += "default-src 'none';";
             policy += " script-src 'self';";
-            policy += " connect-src 'self'";
+            policy += " connect-src 'self' ws://localhost:35729";
             policy += " child-src 'self';";
             policy += " img-src 'self';";
             policy += " style-src 'self';";
