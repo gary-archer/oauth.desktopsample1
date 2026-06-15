@@ -2,7 +2,7 @@
  * The Electron main process, which loads the renderer process app.ts
  */
 
-import {app, BrowserWindow, session} from 'electron';
+import {app, BrowserWindow} from 'electron';
 import path from 'path';
 import {Configuration} from './main/configuration/configuration';
 import {ConfigurationLoader} from './main/configuration/configurationLoader';
@@ -67,9 +67,6 @@ class Main {
         // Load the index.html of the app from the file system
         this.window.loadFile('./index.html');
 
-        // Configure HTTP headers
-        this.initialiseHttpHeaders();
-
         // Emitted when the window is closed
         this.window.on('closed', this.onClosed);
     }
@@ -83,34 +80,6 @@ class Main {
         if (!this.window) {
             this.createMainWindow();
         }
-    }
-
-    /*
-     * Set a content security policy for the renderer process
-     */
-    private initialiseHttpHeaders() {
-
-        session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-
-            let policy = '';
-            policy += "default-src 'none';";
-            policy += " script-src 'self';";
-            policy += " connect-src 'self' ws://localhost:35729";
-            policy += " child-src 'self';";
-            policy += " img-src 'self';";
-            policy += " style-src 'self';";
-            policy += " object-src 'none';";
-            policy += " frame-ancestors 'none';";
-            policy += " base-uri 'self';";
-            policy += " form-action 'self'";
-
-            callback({
-                responseHeaders: {
-                    ...details.responseHeaders,
-                    'Content-Security-Policy': [policy],
-                },
-            });
-        });
     }
 
     /*

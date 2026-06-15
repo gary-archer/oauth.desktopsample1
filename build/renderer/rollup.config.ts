@@ -1,14 +1,20 @@
 import commonjs from '@rollup/plugin-commonjs';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
+import terser from '@rollup/plugin-terser';
 import tailwind from '@tailwindcss/postcss';
-import path from 'path';
+import cssnano from 'cssnano';
+import path from 'node:path';
 import {defineConfig, RollupOptions} from 'rollup';
 import copy from 'rollup-plugin-copy';
 import esbuild from 'rollup-plugin-esbuild';
 import postcss from 'rollup-plugin-postcss';
 import {notifyBrowser} from './plugins/developmentPlugins.js';
 
+// Set base values and use an environment variable to distinguish between development v production builds
+const isDevelopment = process.env.BUILD === 'debug';
 const outputFolder = 'dist';
+
 const options: RollupOptions = {
 
     input: './src/renderer.ts',
@@ -62,6 +68,12 @@ const options: RollupOptions = {
             jsx: 'automatic',
         }),
 
+        // Set IS_DEBUG to true in development mode
+        replace({
+            'IS_DEBUG': JSON.stringify(isDevelopment),
+            preventAssignment: true,
+        }),
+
         // Copy these static files to the output folder when a build completes
         copy({
             targets: [
@@ -69,16 +81,33 @@ const options: RollupOptions = {
             ],
         }),
 
-        // Build development CSS
-        postcss({
-            extract: 'app.css',
-            plugins: [
-                tailwind(),
-            ]
-        }),
+        ...(isDevelopment ? [
 
-        // Add a plugin that implements live reload
-        notifyBrowser(),
+            // Build development CSS
+            postcss({
+                extract: 'app.css',
+                plugins: [
+                    tailwind(),
+                ]
+            }),
+
+            // Implement live reload
+            notifyBrowser(),
+
+        ] : [
+
+            // Build minified production CSS
+            postcss({
+                extract: 'app.css',
+                plugins: [
+                    tailwind(),
+                    cssnano(),
+                ]
+            }),
+
+            // Build minified production JavaScript
+            terser(),
+        ]),
     ],
 };
 

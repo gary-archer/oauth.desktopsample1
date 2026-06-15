@@ -1,13 +1,17 @@
 import commonjs from '@rollup/plugin-commonjs';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
+import terser from '@rollup/plugin-terser';
 import {builtinModules} from 'module';
 import path from 'path';
 import {defineConfig, RollupOptions} from 'rollup';
 import copy from 'rollup-plugin-copy';
 import esbuild from 'rollup-plugin-esbuild';
 
+// Set base values and use an environment variable to distinguish between development v production builds
+const isDevelopment = process.env.BUILD === 'debug';
 const outputFolder = 'dist';
+
 const options: RollupOptions = {
 
     input: './src/main.ts',
@@ -33,21 +37,11 @@ const options: RollupOptions = {
         'electron-store',
         'undici',
         ...builtinModules,
-        ...builtinModules.map((m) => `node:${m}`),
+        ...builtinModules.map((m: string) => `node:${m}`),
     ],
 
     watch: {
         clearScreen: false,
-    },
-
-    // Ignore circular dependency warnings for these modules, that I cannot control
-    onwarn(warning: any, warn: any) {
-        if (warning.code === 'CIRCULAR_DEPENDENCY' &&
-            (warning.message.includes('stubborn-fs') || warning.message.includes('semver'))) {
-            return;
-        }
-
-        warn(warning);
     },
 
     plugins: [
@@ -78,6 +72,9 @@ const options: RollupOptions = {
                 { src: 'package.json', dest: outputFolder },
             ],
         }),
+
+        // Minimize release bundles
+        ...(isDevelopment ? [] : [ terser() ]),
     ],
 };
 

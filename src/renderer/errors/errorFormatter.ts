@@ -68,9 +68,12 @@ export class ErrorFormatter {
      */
     public getErrorStack(error: UIError): ErrorLine | null {
 
-        // Render the stack trace as a long string that can be decompiled at https://sourcemaps.info
-        if (error.stack) {
-            return this.createErrorLine('Stack', error.stack);
+        // In debug builds render the stack trace as a long string
+        // We can then look up results at https://sourcemaps.info
+        if (IS_DEBUG) {
+            if (error.stack) {
+                return this.createErrorLine('Stack', error.stack);
+            }
         }
 
         return null;
