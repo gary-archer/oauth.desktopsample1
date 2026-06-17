@@ -11,12 +11,12 @@ export class LoginRequiredView {
     public async load(): Promise<void> {
 
         const html =
-            `<div class='row'>
-                <div class='col-12 text-center mx-auto loginrequired'>
+            `<div>
+                <div class='text-lg text-center'>
                     <h5>
                         You are signed out - sign in to access the app ...
                     </h5>
-                    <p id='signingin' class='initiallyhidden signingincolor'>
+                    <p id='signingin' class='text-lg text-center text-green-700'>
                         Please enter your credentials in the browser and you will then be returned to the app ...
                     </p>
                 </div>

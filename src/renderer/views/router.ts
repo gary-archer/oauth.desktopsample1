@@ -22,7 +22,7 @@ export class Router {
      */
     public async loadView(): Promise<void> {
 
-        DomUtils.createDiv('#root', 'main');
+        DomUtils.createDiv('#container', 'main');
         if (this.isInLoginRequiredView()) {
 
             // If the user needs to sign in then render the login required view
