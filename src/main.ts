@@ -2,7 +2,7 @@
  * The Electron main process, which loads the renderer process app.ts
  */
 
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, session} from 'electron';
 import path from 'path';
 import {Configuration} from './main/configuration/configuration';
 import {ConfigurationLoader} from './main/configuration/configurationLoader';
@@ -31,7 +31,7 @@ class Main {
 
         // This method will be called when Electron has finished initialization and is ready to create browser windows
         // Some APIs can only be used after this event occurs
-        app.on('ready', this.createMainWindow);
+        app.on('ready', this.onReady);
 
         // Handle reactivation
         app.on('activate', this.onActivate);
@@ -41,9 +41,9 @@ class Main {
     }
 
     /*
-     * Do the main window creation
+     * Do initialization after the ready event
      */
-    private createMainWindow(): void {
+    private onReady(): void {
 
         // Create the browser window
         // Create the window and use Electron recommended security options
@@ -67,6 +67,9 @@ class Main {
         // Load the index.html of the app from the file system
         this.window.loadFile('./index.html');
 
+        // Configure HTTP headers
+        this.initialiseHttpHeaders();
+
         // Emitted when the window is closed
         this.window.on('closed', this.onClosed);
     }
@@ -78,8 +81,52 @@ class Main {
     private onActivate(): void {
 
         if (!this.window) {
-            this.createMainWindow();
+            this.onReady();
         }
+    }
+
+    /*
+     * Set response headers for static content requests
+     */
+    private initialiseHttpHeaders() {
+
+        session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+
+            // During development, allow notifications from the live reload server
+            let connectSrcHosts = "'self'";
+            if (IS_DEBUG) {
+                connectSrcHosts += ' ws://localhost:35729';
+            }
+
+            // Configure a strong content security policy
+            let policy = '';
+            policy += "default-src 'none';";
+            policy += " script-src 'self';";
+            policy += " style-src 'self';";
+            policy += ` connect-src ${connectSrcHosts};`;
+            policy += " child-src 'self';";
+            policy += " img-src 'self';";
+            policy += " object-src 'none';";
+            policy += " frame-ancestors 'none';";
+            policy += " base-uri 'self';";
+            policy += " form-action 'self'";
+
+            const responseHeaders: Record<string, string | string[]> = {
+                ...details.responseHeaders,
+                'content-security-policy': policy,
+            };
+
+            // During development, prevent use of browser caching
+            if (IS_DEBUG) {
+                responseHeaders['cache-control'] = 'no-cache, must-revalidate';
+            } else {
+                responseHeaders['cache-control'] = 'public, max-age=31536000, immutable';
+            }
+
+            callback({
+                responseHeaders,
+            });
+        });
     }
 
     /*
@@ -106,7 +153,7 @@ class Main {
      * Ensure that the this parameter is available in async callbacks
      */
     private setupCallbacks() {
-        this.createMainWindow = this.createMainWindow.bind(this);
+        this.onReady = this.onReady.bind(this);
         this.onActivate = this.onActivate.bind(this);
         this.onClosed = this.onClosed.bind(this);
         this.onAllWindowsClosed = this.onAllWindowsClosed.bind(this);
