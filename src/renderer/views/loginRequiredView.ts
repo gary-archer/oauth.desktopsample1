@@ -16,7 +16,7 @@ export class LoginRequiredView {
                     <h5>
                         You are signed out - sign in to access the app ...
                     </h5>
-                    <p id='signingin' class='text-lg text-center text-green-700'>
+                    <p id='signingin' class='text-lg text-center text-green-700 hidden'>
                         Please enter your credentials in the browser and you will then be returned to the app ...
                     </p>
                 </div>
