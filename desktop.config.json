@@ -1,6 +1,6 @@
 {
     "app": {
-        "apiBaseUrl":       "https://api.authsamples.com/investments2",
+        "apiBaseUrl":       "https://api.authsamples.com/investments",
         "useProxy":         false,
         "proxyUrl":         "http://127.0.0.1:8888"
     },

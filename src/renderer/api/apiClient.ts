@@ -38,25 +38,14 @@ export class ApiClient {
      * Get user information from the authorization server
      */
     public async getOAuthUserInfo() : Promise<OAuthUserInfo> {
-
-        //return await this.getDataFromApi(() => this.ipcEvents.getOAuthUserInfo());
-        return {
-            givenName: 'Fred',
-            familyName: 'Bloggs',
-        };
-
+        return await this.getDataFromApi(() => this.ipcEvents.getOAuthUserInfo());
     }
 
     /*
      * Download user attributes the UI needs that are not stored in the authorization server
      */
     public async getApiUserInfo() : Promise<ApiUserInfo> {
-
-        //return await this.getDataFromApi(() => this.ipcEvents.getApiUserInfo());
-        return {
-            title: 'Regional Manager',
-            regions: ['USA'],
-        };
+        return await this.getDataFromApi(() => this.ipcEvents.getApiUserInfo());
     }
 
     /*

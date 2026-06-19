@@ -41,10 +41,10 @@ export class HeaderButtonsView {
                     <button id='btnReloadData' type='button' disabled class='w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50'>Reload Data</button>
                 </div>
                 <div class='w-1/5 p-1 my-2 flex justify-center'>
-                    <button id='btnExpireAccessToken' type='button' disabled class='w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50'>Expire Token</button>
+                    <button id='btnExpireAccessToken' type='button' disabled class='w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50'>Expire Access Token</button>
                 </div>
                 <div class='w-1/5 p-1 my-2 flex justify-center'>
-                    <button id='btnExpireRefreshToken' type='button' disabled class='w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50'>Expire Token</button>
+                    <button id='btnExpireRefreshToken' type='button' disabled class='w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50'>Expire Refresh Token</button>
                 </div>
                 <div class='w-1/5 p-1 my-2 flex justify-center'>
                     <button id='btnLogout' type='button' disabled class='w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50'>Sign Out</button>
