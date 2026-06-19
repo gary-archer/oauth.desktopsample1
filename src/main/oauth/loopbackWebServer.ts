@@ -1,6 +1,6 @@
 
 import getPort, {clearLockedPorts, portNumbers} from 'get-port';
-import Http from 'http';
+import Http from 'node:http';
 import {EventEmitter} from 'node:events';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 

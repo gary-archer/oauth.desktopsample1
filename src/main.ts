@@ -3,7 +3,7 @@
  */
 
 import {app, BrowserWindow, session} from 'electron';
-import path from 'path';
+import path from 'node:path';
 import {Configuration} from './main/configuration/configuration';
 import {ConfigurationLoader} from './main/configuration/configurationLoader';
 import {IpcMainEvents} from './main/ipcMainEvents';
