@@ -4,6 +4,7 @@ import {OAuthClient} from '../oauth/oauthClient';
 import {OAuthClientImpl} from '../oauth/oauthClientImpl';
 import {ErrorView} from '../views/errorView';
 import {HeaderButtonsView} from '../views/headerButtonsView';
+import {LayoutView} from '../views/layoutView';
 import {LoginNavigation} from '../views/loginNavigation';
 import {Router} from '../views/router';
 import {TitleView} from '../views/titleView';
@@ -13,13 +14,17 @@ import {TitleView} from '../views/titleView';
  */
 export class App {
 
-    private ipcEvents!: IpcRendererEvents;
-    private oauthClient!: OAuthClient;
-    private apiClient!: ApiClient;
+    // Views
     private router!: Router;
+    private layoutView! : LayoutView;
     private titleView!: TitleView;
     private headerButtonsView!: HeaderButtonsView;
     private errorView!: ErrorView;
+
+    // Object state
+    private ipcEvents!: IpcRendererEvents;
+    private oauthClient!: OAuthClient;
+    private apiClient!: ApiClient;
     private isInitialised: boolean;
 
     public constructor() {
@@ -37,6 +42,11 @@ export class App {
         window.onhashchange = this.onHashChange;
 
         try {
+
+            // Import the live reload module
+            if (IS_DEBUG) {
+                await import('./livereload');
+            }
 
             // Do the initial render before getting data
             this.initialRender();
@@ -63,6 +73,9 @@ export class App {
      * Create views and do the initial render
      */
     private initialRender() {
+
+        this.layoutView = new LayoutView();
+        this.layoutView.load();
 
         this.titleView = new TitleView();
         this.titleView.load();

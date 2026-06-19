@@ -1,3 +1,4 @@
+import './app.css';
 import {App} from './renderer/app/app';
 
 /*

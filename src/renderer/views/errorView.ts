@@ -3,33 +3,36 @@ import {ErrorCodes} from '../../shared/errors/errorCodes';
 import {ErrorFactory} from '../../shared/errors/errorFactory';
 import {UIError} from '../../shared/errors/uiError';
 import {ErrorFormatter} from '../errors/errorFormatter';
-import {ErrorLine} from '../errors/errorLine';
+import {ErrorField} from '../errors/errorField';
 import {DomUtils} from './domUtils';
-import {LoginNavigation} from './loginNavigation';
 
 /*
  * The error view renders error details
  */
 export class ErrorView {
 
+    public constructor() {
+        this.setupCallbacks();
+    }
+
     /*
-     * Do the initial render
+     * Do the initial render to create the HTML, which remains hidden until there is an error
      */
     public load(): void {
 
-        DomUtils.createDiv('#root', 'errorcontainer');
+        DomUtils.createDiv('#container', 'errorcontainer');
         const html =
-            `<div class='card border-0'>
-                <div class='row'>
-                    <div id='errortitle' class='col-10 errorcolor largetext fw-bold text-center'>
+            `<div class='bg-white rounded-lg mt-3'>
+                <div class='grid grid-cols-12'>
+                    <div class='col-span-2'>
+                    </div>    
+                    <div id='errortitle' class='col-span-8 text-red-600 text-2xl text-center'>
                     </div>
-                    <div class='col-2 text-end'>
+                    <div class='col-span-2 text-right p-3'>
                         <button id='btnClearError' type='button'>x</button>
                     </div>
                 </div>
-                <div class='row card-body'>
-                    <div id='errorform' class='col-12'>
-                    </div>
+                <div id='errorform' class='items-center mt-5'>
                 </div>
             </div>`;
 
@@ -45,18 +48,14 @@ export class ErrorView {
 
         // Get the error into an object
         const error = ErrorFactory.fromException(exception);
-        if (error.getErrorCode() === ErrorCodes.loginRequired) {
+        if (error.getErrorCode() == ErrorCodes.loginRequired) {
 
-            // Login required errors are not real exceptions, and we will instead move to the login required page
-            LoginNavigation.navigateToLoginRequired();
-
-        } else if (error.getErrorCode() === ErrorCodes.loginCancelled) {
-
-            // The frontend ignores this error code and maintains its current state
+            // Do not render this error and instead move to the login required view
+            location.hash = '#loggedout';
 
         } else {
 
-            // Otherwise render the error details
+            // Otherwise render the error
             this.renderError(error);
         }
     }
@@ -84,60 +83,70 @@ export class ErrorView {
         DomUtils.text('#errortitle', 'Problem Encountered');
 
         // Render the error fields
-        const formatter = new ErrorFormatter();
         const errorHtml =
-            this.getLinesHtml(formatter.getErrorLines(error)) +
-            this.getStackHtml(formatter.getErrorStack(error));
+            this.getFieldsHtml(ErrorFormatter.getErrorFields(error)) +
+            this.getStackHtml(ErrorFormatter.getErrorStack(error));
         DomUtils.html('#errorform', errorHtml);
     }
 
     /*
-     * Get the HTML for the error lines
+     * Get the HTML for the error fields
      */
-    private getLinesHtml(errorLines: ErrorLine[]): string {
+    private getFieldsHtml(fields: ErrorField[]): string {
 
         const htmlTemplate =
-            `{{#lines}}
-                <div class='row'>
-                    <div class='col-4'>
+            `{{#fields}}
+                <div class='grid grid-cols-12 px-3 mt-3'>
+                    <div class='col-span-4'>
                         {{label}}
                     </div>
-                    <div class='col-8 valuecolor fw-bold'>
-                        {{value}}
-                    </div>
+                    {{#isUserAction}}
+                        <div class='col-span-8 text-green-700 font-bold'>
+                            {{value}}
+                        </div>
+                    {{/isUserAction}}
+                    {{#isValue}}
+                        <div class='col-span-8 text-blue-700 font-bold'>
+                            {{value}}
+                        </div>
+                    {{/isValue}}
+                    {{#isIdentifier}}
+                        <div class='col-span-8 text-red-700 font-bold'>
+                            {{value}}
+                        </div>
+                    {{/isIdentifier}}
                 </div>
-            {{/lines}}`;
+            {{/fields}}`;
 
-        return mustache.render(htmlTemplate, {lines: errorLines});
+        return mustache.render(htmlTemplate, {fields: fields});
     }
 
     /*
      * Get the HTML for the error stack trace
      */
-    private getStackHtml(stackLine: ErrorLine | null): string {
+    private getStackHtml(field: ErrorField | null): string {
 
-        if (!stackLine) {
+        if (!field) {
             return '';
         }
 
         const htmlTemplate =
-            `<div class='row' />
-                <div class='col-4'>
-                    &nbsp;
-                </div>
-                <div class='col-8'>
-                    &nbsp;
-                </div>
-            </div>
-            <div class='row' />
-                 <div class='col-4'>
+            `<div class='grid grid-cols-12 px-3 mt-3' />
+                 <div class='col-span-4'>
                      {{label}}
                  </div>
-                 <div class='col-8 small'>
-                     {{value}}
+                 <div class='col-span-8'>
+                    <span class='text-sm'>{{value}}</span>
                  </div>
              </div>`;
 
-        return mustache.render(htmlTemplate, stackLine);
+        return mustache.render(htmlTemplate, field);
+    }
+
+    /*
+     * Plumbing to make the this parameter available in callbacks
+     */
+    private setupCallbacks(): void {
+        this.clear = this.clear.bind(this);
     }
 }

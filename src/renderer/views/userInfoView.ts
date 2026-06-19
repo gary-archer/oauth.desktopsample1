@@ -1,43 +1,96 @@
 import mustache from 'mustache';
+import {ApiUserInfo} from '../../shared/api/apiUserInfo';
+import {OAuthUserInfo} from '../../shared/api/oauthUserInfo';
 import {ApiClient} from '../api/apiClient';
 import {DomUtils} from './domUtils';
 
 /*
- * The user info view renders details of the logged in user
+ * The user info view renders details of the logged in user from multiple data sources
  */
 export class UserInfoView {
 
+    private oauthUserInfo: OAuthUserInfo | null;
+    private apiUserInfo: ApiUserInfo | null;
+
+    public constructor() {
+        this.oauthUserInfo = null;
+        this.apiUserInfo = null;
+    }
+
     /*
-     * Load data and update the view
+     * Run the user info view and get data if required
      */
     public async load(apiClient: ApiClient): Promise<void> {
 
-        // Show nothing when logged out
-        if (location.hash.indexOf('loginrequired') !== -1) {
-            DomUtils.text('#username', '');
-            return;
+        if (!this.oauthUserInfo || !this.apiUserInfo) {
+            this.oauthUserInfo = await apiClient.getOAuthUserInfo();
+            this.apiUserInfo = await apiClient.getApiUserInfo();
         }
 
-        // Make the requests to get user info
-        const oauthUserInfo = await apiClient.getOAuthUserInfo();
-        const apiUserInfo = await apiClient.getApiUserInfo();
-
-        // Render results
-        if (oauthUserInfo && oauthUserInfo.givenName && oauthUserInfo.familyName) {
-
-            let text = mustache.render('{{givenName}} {{familyName}}', oauthUserInfo);
-            if (apiUserInfo.role === 'admin') {
-                text += ' (ADMIN)';
-            }
-
-            DomUtils.text('#username', text);
+        if (this.oauthUserInfo && this.apiUserInfo) {
+            this.renderData(this.oauthUserInfo, this.apiUserInfo);
         }
     }
 
     /*
-     * Clear user info after logout
+     * Render user info
      */
-    public async clear(): Promise<void> {
+    private renderData(oauthUserInfo: OAuthUserInfo, apiUserInfo: ApiUserInfo) {
+
+        // Build a view model from the data
+        const viewModel = {
+            userName: this.getUserNameForDisplay(oauthUserInfo),
+            title: this.getUserTitle(apiUserInfo),
+            regions: this.getUserRegions(apiUserInfo),
+        };
+
+        // Form the template
+        const htmlTemplate =
+            `<div class='text-right font-bold basictooltip'>{{userName}}
+                <div class='basictooltiptext'>
+                    <small>{{title}}</small>
+                    <br />
+                    <small>{{regions}}</small>
+                </div>
+            </div>`;
+
+        // Render results
+        const html = mustache.render(htmlTemplate, viewModel);
+        DomUtils.html('#username', html);
+    }
+
+    /*
+     * Clear the view when we are logged out
+     */
+    public clear(): void {
         DomUtils.text('#username', '');
+    }
+
+    /*
+     * Get a name string using OAuth user info
+     */
+    private getUserNameForDisplay(oauthUserInfo: OAuthUserInfo): string {
+
+        if (!oauthUserInfo.givenName || !oauthUserInfo.familyName) {
+            return '';
+        }
+
+        return `${oauthUserInfo.givenName} ${oauthUserInfo.familyName}`;
+    }
+
+    /*
+     * Show the user's title when the name is clicked
+     */
+    private getUserTitle(apiUserInfo: ApiUserInfo): string {
+        return apiUserInfo.title || '';
+    }
+
+    /*
+     * Show the user's regions when the name is clicked
+     */
+    private getUserRegions(apiUserInfo: ApiUserInfo): string {
+
+        const regions = apiUserInfo.regions.join(', ');
+        return `[${regions}]`;
     }
 }

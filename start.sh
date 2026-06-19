@@ -41,7 +41,7 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Check code quality
+# Make code quality checks
 #
 npm run lint
 if [ $? -ne 0 ]; then
@@ -61,16 +61,16 @@ mkdir dist
 echo 'Bulding application bundles ...'
 if [ "$PLATFORM" == 'MACOS' ]; then
 
-  open -a Terminal ./build.sh
+  open -a Terminal ./buildDebug.sh
 
 elif [ "$PLATFORM" == 'WINDOWS' ]; then
   
   GIT_BASH="C:\Program Files\Git\git-bash.exe"
-  "$GIT_BASH" -c ./build.sh &
+  "$GIT_BASH" -c ./buildDebug.sh &
 
 elif [ "$PLATFORM" == 'LINUX' ]; then
 
-  gnome-terminal -- ./build.sh
+  gnome-terminal -- ./buildDebug.sh
 fi
 
 #
