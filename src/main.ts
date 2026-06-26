@@ -116,11 +116,9 @@ class Main {
                 'content-security-policy': policy,
             };
 
-            // During development, prevent use of browser caching
+            // During development, prevent use of browser caching so that live reload works
             if (IS_DEBUG) {
                 responseHeaders['cache-control'] = 'no-cache, must-revalidate';
-            } else {
-                responseHeaders['cache-control'] = 'public, max-age=31536000, immutable';
             }
 
             callback({
