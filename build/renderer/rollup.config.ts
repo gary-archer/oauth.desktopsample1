@@ -6,10 +6,9 @@ import tailwind from '@tailwindcss/postcss';
 import cssnano from 'cssnano';
 import path from 'node:path';
 import {defineConfig, RollupOptions} from 'rollup';
-import copy from 'rollup-plugin-copy';
 import esbuild from 'rollup-plugin-esbuild';
 import postcss from 'rollup-plugin-postcss';
-import {notifyBrowser} from './plugins/developmentPlugins.js';
+import {copyFiles, notifyBrowser} from '../plugins.js';
 
 // Set base values and use an environment variable to distinguish between development v production builds
 const isDevelopment = process.env.BUILD === 'debug';
@@ -74,11 +73,9 @@ const options: RollupOptions = {
         }),
 
         // Copy these static files to the output folder when a build completes
-        copy({
-            targets: [
-                { src: 'index.html', dest: outputFolder },
-            ],
-        }),
+        copyFiles(outputFolder, [
+            'index.html',
+        ]),
 
         ...(isDevelopment ? [
 
