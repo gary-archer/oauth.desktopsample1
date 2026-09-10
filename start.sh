@@ -58,7 +58,7 @@ mkdir dist
 #
 # Build the code in watch mode
 #
-echo 'Bulding application bundles ...'
+echo 'Building application bundles ...'
 if [ "$PLATFORM" == 'MACOS' ]; then
 
   open -a Terminal ./buildDebug.sh
@@ -81,7 +81,7 @@ while [ ! -f ./dist/app.bundle.js ]; do
 done
 
 #
-# On Linux, work around this Electron issue:
+# On Linux, enter a password to work around this Electron issue:
 # - https://github.com/electron/electron/issues/42510
 #  
 if [ "$PLATFORM" == 'LINUX' ]; then
